@@ -85,7 +85,7 @@
       <div onclick="window.selectTechnique('custom')" id="card-custom" class="tech-card bg-white p-5 rounded-3xl border-2 border-slate-200 hover:border-indigo-400 cursor-pointer transition hover:scale-[1.02]">
         <div class="flex justify-between items-start mb-3">
           <span class="text-2xl">🎯</span>
-          <span class="text-[10px] font-bold bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full">+5 Points / 10 นาที</span>
+          <span class="text-[10px] font-bold bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full">+0.5 Points / 1 นาที</span>
         </div>
         <h3 class="font-bold text-slate-800 text-base">4. จับเวลาถอยหลังเอง</h3>
         <p class="text-xs text-indigo-600 font-bold mt-0.5">กำหนดเป้าหมายเวลาเอง</p>
@@ -143,10 +143,10 @@
     let timer = null;
     let isRunning = false;
     let isBreak = false;
-    let currentTechnique = 'pomodoro'; // pomodoro, 52_17, 90_min, custom
+    let currentTechnique = 'pomodoro';
     
-    let studyDuration = 25 * 60; // seconds
-    let breakDuration = 5 * 60;  // seconds
+    let studyDuration = 25 * 60;
+    let breakDuration = 5 * 60;
     let timeLeft = studyDuration;
     let completedRounds = 0;
 
@@ -174,7 +174,7 @@
     async function loadUserData() {
       const { data } = await supabase.from('profiles').select('points').eq('id', currentUser.id).single();
       if (data) {
-        userPoints = data.points || 0;
+        userPoints = parseFloat(data.points) || 0;
         document.getElementById('userPointsDisplay').innerText = userPoints;
       }
     }
@@ -189,7 +189,6 @@
       currentTechnique = techKey;
       const tech = techniques[techKey];
 
-      // Highlight Active Card
       document.querySelectorAll('.tech-card').forEach(card => {
         card.classList.remove('border-indigo-500', 'shadow-md');
         card.classList.add('border-slate-200');
@@ -216,7 +215,7 @@
 
     window.setCustomTime = function() {
       if (isRunning) window.resetTimer();
-      const mins = parseInt(document.getElementById('customMinutesInput').value) || 10;
+      const mins = parseInt(document.getElementById('customMinutesInput').value) || 1;
       studyDuration = mins * 60;
       timeLeft = studyDuration;
       updateDisplay();
@@ -266,7 +265,6 @@
       document.getElementById('startPauseBtn').innerHTML = '▶️ เริ่มจับเวลา';
 
       if (!isBreak) {
-        // อ่านหนังสือเสร็จแล้ว!
         completedRounds++;
         document.getElementById('completedRoundsCount').innerText = completedRounds;
 
@@ -274,14 +272,13 @@
         const minsRead = Math.floor(studyDuration / 60);
 
         if (currentTechnique === 'custom') {
-          // คิดขั้นต่ำ 1 Point สำหรับทดสอบเวลาสั้นๆ (ถ้า 10 นาทีขึ้นไปคิดนาทีละ 0.5 Point)
-          pointsEarned = Math.max(1, Math.floor(minsRead * 0.5));
+          // คำนวณแบบ 1 นาที = 0.5 Point ตรงๆ
+          pointsEarned = minsRead * 0.5;
         } else {
           // ครบเทคนิคได้ 50 Points
           pointsEarned = 50;
         }
 
-        // เพิ่ม Points ให้ผู้ใช้ใน Supabase
         if (pointsEarned > 0) {
           userPoints += pointsEarned;
           document.getElementById('userPointsDisplay').innerText = userPoints;
@@ -301,7 +298,6 @@
           alert('🎉 ยินดีด้วย! คุณอ่านหนังสือครบช่วงเวลาแล้ว');
         }
 
-        // ถ้ามีเวลาพัก ให้สลับไปช่วงพัก
         if (breakDuration > 0) {
           isBreak = true;
           timeLeft = breakDuration;
@@ -314,7 +310,6 @@
         }
 
       } else {
-        // หมดเวลาพัก
         alert('⏰ หมดเวลาพักผ่อนแล้ว! พร้อมสำหรับรอบถัดไปหรือยังครับ?');
         window.resetTimer();
       }
