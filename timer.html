@@ -3,129 +3,322 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MindStudy AI - จับเวลาอ่านหนังสือ</title>
+  <title>MindStudy AI - จับเวลาเรียน</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen p-4 md:p-8">
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col">
 
-  <div class="max-w-xl mx-auto space-y-6 text-center">
-    
-    <header class="flex justify-between items-center bg-white p-4 rounded-2xl border">
-      <a href="dashboard.html" class="text-sm font-bold text-indigo-600">← กลับแดชบอร์ด</a>
-      <h1 class="font-bold text-slate-700">โหมดจับเวลาอ่านหนังสือ</h1>
-    </header>
-
-    <div class="bg-white p-8 rounded-2xl border shadow-sm space-y-6">
-      
-      <!-- เลือกโหมด -->
-      <div class="flex justify-center gap-2">
-        <button onclick="setMode('pomodoro', 25)" class="px-4 py-2 border rounded-xl font-semibold text-xs active:bg-indigo-50">Pomodoro (25 นาที)</button>
-        <button onclick="setMode('60_5', 60)" class="px-4 py-2 border rounded-xl font-semibold text-xs active:bg-indigo-50">อ่าน 60 นาที</button>
-      </div>
-
-      <div>
-        <input id="subjectInput" type="text" placeholder="วิชาที่กำลังจะอ่าน..." class="w-full p-3 border rounded-xl text-center outline-none">
-      </div>
-
-      <!-- Display ตัวเลขจับเวลา -->
-      <div id="timerDisplay" class="text-6xl font-extrabold text-indigo-600 tracking-wider">25:00</div>
-
-      <div class="flex justify-center gap-3">
-        <button id="startBtn" onclick="toggleTimer()" class="bg-indigo-600 text-white font-bold px-8 py-3 rounded-xl shadow-md hover:bg-indigo-700">เริ่มอ่าน</button>
-        <button onclick="resetTimer()" class="bg-slate-200 text-slate-600 font-bold px-6 py-3 rounded-xl">รีเซ็ต</button>
-      </div>
-    </div>
-
-    <!-- มินิเกม Modal (ซ่อนอยู่) -->
-    <div id="gameModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-      <div class="bg-white p-6 rounded-2xl max-w-sm w-full space-y-4 text-center">
-        <h3 class="font-bold text-lg text-emerald-600">🎉 อ่านจบแล้ว! พักสมองเล่นเกมเป่ายิงฉุบ</h3>
-        <p class="text-xs text-slate-500">เลือกเลยจะออกอะไร:</p>
-        <div class="flex justify-center gap-4 text-2xl">
-          <button onclick="playRPS('✊')" class="p-3 border rounded-xl hover:bg-slate-100">✊</button>
-          <button onclick="playRPS('✋')" class="p-3 border rounded-xl hover:bg-slate-100">✋</button>
-          <button onclick="playRPS('✌️')" class="p-3 border rounded-xl hover:bg-slate-100">✌️</button>
+  <!-- Navigation Bar -->
+  <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16 items-center">
+        <div class="flex items-center space-x-8">
+          <span class="text-2xl font-extrabold text-indigo-600 flex items-center gap-2">🧠 MindStudy AI</span>
+          <div class="hidden md:flex space-x-4">
+            <a href="dashboard.html" class="text-slate-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-lg transition">หน้าหลัก</a>
+            <a href="timer.html" class="text-indigo-600 font-bold px-3 py-2 rounded-lg bg-indigo-50">จับเวลาเรียน</a>
+            <a href="calendar.html" class="text-slate-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-lg transition">ปฏิทินวางแผน</a>
+            <a href="minigame.html" class="text-slate-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-lg transition">มินิเกมห้องพิกเซล</a>
+          </div>
         </div>
-        <div id="rpsResult" class="text-sm font-bold text-indigo-600"></div>
-        <button onclick="closeGame()" class="w-full bg-slate-200 py-2 rounded-xl text-xs font-bold">ปิดมินิเกม</button>
+        <div class="relative group">
+          <button class="flex items-center space-x-3 bg-slate-100 hover:bg-indigo-50 p-2 rounded-full border border-slate-200 transition">
+            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm" id="userAvatar">U</div>
+            <span class="text-sm font-semibold text-slate-700 pr-2 hidden sm:inline" id="userEmailDisplay">Loading...</span>
+          </button>
+          <div class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 hidden group-hover:block transition-all duration-200 z-50">
+            <div class="text-xs text-slate-400 font-medium">คะแนนสะสมของคุณ</div>
+            <div class="text-2xl font-black text-amber-500 my-1 flex items-center gap-1">⭐ <span id="userPointsDisplay">0</span> <span class="text-xs font-normal text-slate-500">Points</span></div>
+            <hr class="my-3 border-slate-100">
+            <button onclick="window.handleLogout()" class="w-full text-left text-sm font-semibold text-rose-500 hover:bg-rose-50 p-2 rounded-xl transition">🚪 ออกจากระบบ</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 space-y-8">
+    
+    <!-- Header -->
+    <div class="text-center max-w-2xl mx-auto space-y-2">
+      <h1 class="text-3xl font-black text-slate-800">⏱️ โหมดจับเวลาอ่านหนังสือ</h1>
+      <p class="text-sm text-slate-500">เลือกเทคนิคการเรียนที่เหมาะสมกับคุณ เพื่อเพิ่มประสิทธิภาพและสะสม Points!</p>
+    </div>
+
+    <!-- Mode Selector Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- 1. Pomodoro -->
+      <div onclick="window.selectTechnique('pomodoro')" id="card-pomodoro" class="tech-card bg-white p-5 rounded-3xl border-2 border-indigo-500 shadow-md cursor-pointer transition hover:scale-[1.02]">
+        <div class="flex justify-between items-start mb-3">
+          <span class="text-2xl">🍅</span>
+          <span class="text-[10px] font-bold bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full">+50 Points / รอบ</span>
+        </div>
+        <h3 class="font-bold text-slate-800 text-base">1. เทคนิคโพโมโดโร</h3>
+        <p class="text-xs text-indigo-600 font-bold mt-0.5">อ่าน 25 นาที / พัก 5 นาที</p>
+        <p class="text-xs text-slate-400 mt-2">ช่วยรักษาความสดชื่นของสมอง ทำซ้ำครบ 4 รอบแล้วพักยาว 15-30 นาที</p>
+      </div>
+
+      <!-- 2. 52/17 -->
+      <div onclick="window.selectTechnique('52_17')" id="card-52_17" class="tech-card bg-white p-5 rounded-3xl border-2 border-slate-200 hover:border-indigo-400 cursor-pointer transition hover:scale-[1.02]">
+        <div class="flex justify-between items-start mb-3">
+          <span class="text-2xl">📊</span>
+          <span class="text-[10px] font-bold bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full">+50 Points / รอบ</span>
+        </div>
+        <h3 class="font-bold text-slate-800 text-base">2. เทคนิค 52/17</h3>
+        <p class="text-xs text-indigo-600 font-bold mt-0.5">อ่าน 52 นาที / พัก 17 นาที</p>
+        <p class="text-xs text-slate-400 mt-2">อิงตามสถิติประสิทธิภาพสูงสุดของมนุษย์ รีเซ็ตสมองอย่างเต็มที่ก่อนเริ่มรอบถัดไป</p>
+      </div>
+
+      <!-- 3. 90 Min -->
+      <div onclick="window.selectTechnique('90_min')" id="card-90_min" class="tech-card bg-white p-5 rounded-3xl border-2 border-slate-200 hover:border-indigo-400 cursor-pointer transition hover:scale-[1.02]">
+        <div class="flex justify-between items-start mb-3">
+          <span class="text-2xl">🧠</span>
+          <span class="text-[10px] font-bold bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full">+50 Points / รอบ</span>
+        </div>
+        <h3 class="font-bold text-slate-800 text-base">3. เทคนิค 90 นาที</h3>
+        <p class="text-xs text-indigo-600 font-bold mt-0.5">อ่าน 90 นาที / พัก 20 นาที</p>
+        <p class="text-xs text-slate-400 mt-2">จับเวลาตามวงจรธรรมชาติ (Ultradian Rhythm) เหมาะกับเนื้อหาลึกๆ หรือทำข้อสอบ</p>
+      </div>
+
+      <!-- 4. Custom Timer -->
+      <div onclick="window.selectTechnique('custom')" id="card-custom" class="tech-card bg-white p-5 rounded-3xl border-2 border-slate-200 hover:border-indigo-400 cursor-pointer transition hover:scale-[1.02]">
+        <div class="flex justify-between items-start mb-3">
+          <span class="text-2xl">🎯</span>
+          <span class="text-[10px] font-bold bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full">+5 Points / 10 นาที</span>
+        </div>
+        <h3 class="font-bold text-slate-800 text-base">4. จับเวลาถอยหลังเอง</h3>
+        <p class="text-xs text-indigo-600 font-bold mt-0.5">กำหนดเป้าหมายเวลาเอง</p>
+        <p class="text-xs text-slate-400 mt-2">ตั้งเป้าจำนวนหน้าหรือบท แล้วตั้งเวลาถอยหลัง ช่วยลดอาการโอ้เอ้ระหว่างอ่าน</p>
       </div>
     </div>
 
-  </div>
+    <!-- Timer Box Section -->
+    <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm max-w-2xl mx-auto text-center space-y-6">
+      
+      <!-- Current Mode Label -->
+      <div>
+        <span id="timerStatusBadge" class="text-xs font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-600">
+          ช่วงเวลาอ่านหนังสือ (Study Time)
+        </span>
+        <h2 id="currentTechTitle" class="text-xl font-bold text-slate-800 mt-3">เทคนิคโพโมโดโร (25/5)</h2>
+      </div>
+
+      <!-- Custom Input (Hidden by default) -->
+      <div id="customTimeInputGroup" class="hidden flex justify-center items-center gap-2">
+        <label class="text-sm font-bold text-slate-600">กำหนดเวลาอ่าน (นาที):</label>
+        <input type="number" id="customMinutesInput" min="1" max="180" value="40" class="w-20 p-2 border border-slate-300 rounded-xl text-center font-bold text-indigo-600 outline-none focus:ring-2 focus:ring-indigo-400">
+        <button onclick="window.setCustomTime()" class="bg-indigo-600 text-white font-bold px-3 py-2 rounded-xl text-xs hover:bg-indigo-700">ตั้งเวลา</button>
+      </div>
+
+      <!-- Big Clock Display -->
+      <div class="text-7xl sm:text-8xl font-black text-slate-800 tracking-tight font-mono my-4" id="timeDisplay">
+        25:00
+      </div>
+
+      <!-- Controls -->
+      <div class="flex justify-center items-center gap-4">
+        <button id="startPauseBtn" onclick="window.toggleTimer()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-4 rounded-2xl transition shadow-lg text-lg flex items-center gap-2">
+          ▶️ เริ่มจับเวลา
+        </button>
+        <button onclick="window.resetTimer()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-6 py-4 rounded-2xl transition text-lg">
+          🔄 รีเซ็ต
+        </button>
+      </div>
+
+      <div class="text-xs text-slate-400 pt-2" id="roundCounterText">
+        รอบที่สำเร็จวันนี้: <span class="font-bold text-indigo-600" id="completedRoundsCount">0</span> รอบ
+      </div>
+    </div>
+
+  </main>
 
   <script type="module">
     import { supabase } from './js/supabase-config.js';
 
+    let currentUser = null;
+    let userPoints = 0;
+    
+    // Timer Variables
     let timer = null;
-    let totalSeconds = 25 * 60;
-    let initialMinutes = 25;
     let isRunning = false;
-    let currentMode = 'pomodoro';
+    let isBreak = false;
+    let currentTechnique = 'pomodoro'; // pomodoro, 52_17, 90_min, custom
+    
+    let studyDuration = 25 * 60; // seconds
+    let breakDuration = 5 * 60;  // seconds
+    let timeLeft = studyDuration;
+    let completedRounds = 0;
 
-    window.setMode = (mode, minutes) => {
-      currentMode = mode;
-      initialMinutes = minutes;
-      totalSeconds = minutes * 60;
+    const techniques = {
+      pomodoro: { name: 'เทคนิคโพโมโดโร (25/5)', study: 25, break: 5, reward: 50 },
+      '52_17': { name: 'เทคนิค 52/17 (52/17)', study: 52, break: 17, reward: 50 },
+      '90_min': { name: 'เทคนิค 90 นาที (90/20)', study: 90, break: 20, reward: 50 },
+      custom: { name: 'จับเวลาถอยหลังเอง', study: 40, break: 0, reward: 0 }
+    };
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+      currentUser = user;
+      document.getElementById('userEmailDisplay').innerText = user.email;
+      document.getElementById('userAvatar').innerText = user.email.charAt(0).toUpperCase();
+
+      await loadUserData();
+      updateDisplay();
+    });
+
+    async function loadUserData() {
+      const { data } = await supabase.from('profiles').select('points').eq('id', currentUser.id).single();
+      if (data) {
+        userPoints = data.points || 0;
+        document.getElementById('userPointsDisplay').innerText = userPoints;
+      }
+    }
+
+    // เลือกเทคนิค
+    window.selectTechnique = function(techKey) {
+      if (isRunning) {
+        if (!confirm('การเปลี่ยนเทคนิคจะรีเซ็ตเวลาที่กำลังจับอยู่ คุณต้องการเปลี่ยนหรือไม่?')) return;
+        window.resetTimer();
+      }
+
+      currentTechnique = techKey;
+      const tech = techniques[techKey];
+
+      // Highlight Active Card
+      document.querySelectorAll('.tech-card').forEach(card => {
+        card.classList.remove('border-indigo-500', 'shadow-md');
+        card.classList.add('border-slate-200');
+      });
+      document.getElementById(`card-${techKey}`).classList.add('border-indigo-500', 'shadow-md');
+      document.getElementById(`card-${techKey}`).classList.remove('border-slate-200');
+
+      document.getElementById('currentTechTitle').innerText = tech.name;
+
+      if (techKey === 'custom') {
+        document.getElementById('customTimeInputGroup').classList.remove('hidden');
+        const customMins = parseInt(document.getElementById('customMinutesInput').value) || 40;
+        studyDuration = customMins * 60;
+      } else {
+        document.getElementById('customTimeInputGroup').classList.add('hidden');
+        studyDuration = tech.study * 60;
+      }
+
+      breakDuration = tech.break * 60;
+      isBreak = false;
+      timeLeft = studyDuration;
       updateDisplay();
     };
 
-    function updateDisplay() {
-      const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
-      const s = (totalSeconds % 60).toString().padStart(2, '0');
-      document.getElementById('timerDisplay').innerText = `${m}:${s}`;
-    }
+    window.setCustomTime = function() {
+      if (isRunning) window.resetTimer();
+      const mins = parseInt(document.getElementById('customMinutesInput').value) || 10;
+      studyDuration = mins * 60;
+      timeLeft = studyDuration;
+      updateDisplay();
+    };
 
-    window.toggleTimer = () => {
+    // Toggle Start / Pause
+    window.toggleTimer = function() {
+      const btn = document.getElementById('startPauseBtn');
       if (isRunning) {
         clearInterval(timer);
-        document.getElementById('startBtn').innerText = 'ลุยต่อ';
+        isRunning = false;
+        btn.innerHTML = '▶️ เริ่มจับเวลาต่อ';
+        btn.className = 'bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-4 rounded-2xl transition shadow-lg text-lg flex items-center gap-2';
       } else {
-        timer = setInterval(async () => {
-          if (totalSeconds > 0) {
-            totalSeconds--;
+        isRunning = true;
+        btn.innerHTML = '⏸️ พักชั่วคราว';
+        btn.className = 'bg-amber-500 hover:bg-amber-600 text-white font-bold px-8 py-4 rounded-2xl transition shadow-lg text-lg flex items-center gap-2';
+        
+        timer = setInterval(() => {
+          if (timeLeft > 0) {
+            timeLeft--;
             updateDisplay();
           } else {
-            clearInterval(timer);
-            await finishSession();
+            handleTimerComplete();
           }
         }, 1000);
-        document.getElementById('startBtn').innerText = 'หยุดชั่วคราว';
       }
-      isRunning = !isRunning;
     };
 
-    window.resetTimer = () => {
+    // Reset Timer
+    window.resetTimer = function() {
       clearInterval(timer);
       isRunning = false;
-      totalSeconds = initialMinutes * 60;
+      isBreak = false;
+      timeLeft = studyDuration;
+      document.getElementById('startPauseBtn').innerHTML = '▶️ เริ่มจับเวลา';
+      document.getElementById('startPauseBtn').className = 'bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-4 rounded-2xl transition shadow-lg text-lg flex items-center gap-2';
+      document.getElementById('timerStatusBadge').innerText = 'ช่วงเวลาอ่านหนังสือ (Study Time)';
+      document.getElementById('timerStatusBadge').className = 'text-xs font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-600';
       updateDisplay();
-      document.getElementById('startBtn').innerText = 'เริ่มอ่าน';
     };
 
-    async function finishSession() {
-      const subject = document.getElementById('subjectInput').value || 'วิชาทั่วไป';
-      const { data: { user } } = await supabase.auth.getUser();
+    // Complete Handling & Point Calculation
+    async function handleTimerComplete() {
+      clearInterval(timer);
+      isRunning = false;
+      document.getElementById('startPauseBtn').innerHTML = '▶️ เริ่มจับเวลา';
 
-      await supabase.from('study_sessions').insert([{
-        user_id: user.id,
-        subject: subject,
-        duration_minutes: initialMinutes,
-        mode: currentMode,
-        study_date: new Date().toISOString().split('T')[0]
-      }]);
+      if (!isBreak) {
+        // อ่านหนังสือเสร็จแล้ว!
+        completedRounds++;
+        document.getElementById('completedRoundsCount').innerText = completedRounds;
 
-      document.getElementById('gameModal').classList.remove('hidden');
+        let pointsEarned = 0;
+        if (currentTechnique === 'custom') {
+          // กำหนดเอง: ทุกๆ 10 นาที ได้ 5 Points
+          const minsRead = Math.floor(studyDuration / 60);
+          pointsEarned = Math.floor(minsRead / 10) * 5;
+        } else {
+          // ครบเทคนิคได้ 50 Points
+          pointsEarned = 50;
+        }
+
+        // เพิ่ม Points ให้ผู้ใช้ใน Supabase
+        if (pointsEarned > 0) {
+          userPoints += pointsEarned;
+          document.getElementById('userPointsDisplay').innerText = userPoints;
+          await supabase.from('profiles').upsert({ id: currentUser.id, points: userPoints });
+          alert(`🎉 ยินดีด้วย! คุณอ่านหนังสือครบช่วงเวลาแล้ว ได้รับ +${pointsEarned} Points!`);
+        } else {
+          alert('🎉 ยินดีด้วย! คุณอ่านหนังสือครบช่วงเวลาแล้ว');
+        }
+
+        // ถ้ามีเวลาพัก ให้สลับไปช่วงพัก
+        if (breakDuration > 0) {
+          isBreak = true;
+          timeLeft = breakDuration;
+          document.getElementById('timerStatusBadge').innerText = '☕ ช่วงเวลาพักผ่อน (Break Time)';
+          document.getElementById('timerStatusBadge').className = 'text-xs font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600';
+          updateDisplay();
+          alert('ได้เวลาพักผ่อนแล้วครับ! ลุกขึ้นยืดเส้นยืดสายเปลี่ยนอิริยาบถได้เลย');
+        } else {
+          window.resetTimer();
+        }
+
+      } else {
+        // หมดเวลาพัก
+        alert('⏰ หมดเวลาพักผ่อนแล้ว! พร้อมสำหรับรอบถัดไปหรือยังครับ?');
+        window.resetTimer();
+      }
     }
 
-    window.playRPS = (userChoice) => {
-      const choices = ['✊', '✋', '✌️'];
-      const aiChoice = choices[Math.floor(Math.random() * 3)];
-      document.getElementById('rpsResult').innerText = `คุณ: ${userChoice} vs AI: ${aiChoice}`;
-    };
+    function updateDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      document.getElementById('timeDisplay').innerText = 
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
 
-    window.closeGame = () => {
-      document.getElementById('gameModal').classList.add('hidden');
-      resetTimer();
+    window.handleLogout = async function() {
+      await supabase.auth.signOut();
+      window.location.href = 'index.html';
     };
   </script>
 </body>
