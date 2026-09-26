@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindStudy AI - ปฏิทินการเรียน</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen p-4 md:p-8">
+
+  <div class="max-w-2xl mx-auto space-y-6">
+    <header class="flex justify-between items-center bg-white p-4 rounded-2xl border">
+      <a href="dashboard.html" class="text-sm font-bold text-indigo-600">← กลับแดชบอร์ด</a>
+      <h1 class="font-bold text-slate-700">วางแผนตารางเรียน</h1>
+    </header>
+
+    <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
+      <h2 class="font-bold text-slate-700">➕ เพิ่มเป้าหมายการอ่านหนังสือ</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <input id="eventTitle" type="text" placeholder="หัวข้อที่จะอ่าน..." class="p-3 border rounded-xl text-sm outline-none">
+        <input id="eventDate" type="date" class="p-3 border rounded-xl text-sm outline-none">
+      </div>
+      <button onclick="addEvent()" class="w-full bg-indigo-600 text-white font-bold py-2 rounded-xl text-sm hover:bg-indigo-700">บันทึกลงปฏิทิน</button>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
+      <h2 class="font-bold text-slate-700">📌 ตารางกิจกรรมที่วางแผนไว้</h2>
+      <div id="eventList" class="space-y-2 text-sm">กำลังโหลดข้อมูล...</div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from './js/supabase-config.js';
+
+    let currentUser = null;
+
+    async function init() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) window.location.href = 'index.html';
+      currentUser = user;
+      loadEvents();
+    }
+
+    window.addEvent = async () => {
+      const title = document.getElementById('eventTitle').value;
+      const date = document.getElementById('eventDate').value;
+
+      if (!title || !date) return alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+
+      const { error } = await supabase.from('planner_events').insert([{
+        user_id: currentUser.id,
+        title: title,
+        event_date: date
+      }]);
+
+      if (!error) {
+        alert('บันทึกเรียบร้อย!');
+        loadEvents();
+      }
+    };
+
+    async function loadEvents() {
+      const { data: events } = await supabase.from('planner_events').select('*').eq('user_id', currentUser.id).order('event_date', { ascending: true });
+      const listContainer = document.getElementById('eventList');
+
+      if (!events || events.length === 0) {
+        listContainer.innerHTML = '<div class="text-slate-400">ยังไม่มีแผนการเรียนที่บันทึกไว้</div>';
+        return;
+      }
+
+      listContainer.innerHTML = events.map(e => `
+        <div class="flex justify-between items-center p-3 border rounded-xl bg-slate-50">
+          <span class="font-semibold text-slate-700">${e.title}</span>
+          <span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg">${e.event_date}</span>
+        </div>
+      `).join('');
+    }
+
+    init();
+  </script>
+</body>
+</html>
