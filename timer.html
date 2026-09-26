@@ -138,6 +138,7 @@
 
     let currentUser = null;
     let userPoints = 0;
+    let totalStudyMinutes = 0; // เก็บนาทีการเรียนรวม
     
     // Timer Variables
     let timer = null;
@@ -177,14 +178,16 @@
     });
 
     async function loadUserData() {
+      // ดึงข้อมูล points และ total_study_time จาก profiles
       const { data, error } = await supabase
         .from('profiles')
-        .select('points')
+        .select('points, total_study_time')
         .eq('id', currentUser.id)
         .single();
 
       if (data && !error) {
         userPoints = parseFloat(data.points) || 0;
+        totalStudyMinutes = parseInt(data.total_study_time) || 0;
         document.getElementById('userPointsDisplay').innerText = userPoints;
       }
     }
@@ -283,34 +286,47 @@
         const minsRead = Math.floor(studyDuration / 60);
 
         if (currentTechnique === 'custom') {
-          // คำนวณแบบ 1 นาที = 0.5 Point ตรงๆ
+          // คำนวณแบบ 1 นาที = 0.5 Point
           pointsEarned = minsRead * 0.5;
         } else {
           // ครบเทคนิคได้ 50 Points
           pointsEarned = 50;
         }
 
-        if (pointsEarned > 0) {
-          userPoints += pointsEarned;
-          document.getElementById('userPointsDisplay').innerText = userPoints;
-          
-          // เปลี่ยนเป็น .update() เพื่อความเสถียร
-          const { error } = await supabase
-            .from('profiles')
-            .update({ 
-              points: userPoints,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', currentUser.id);
+        userPoints += pointsEarned;
+        totalStudyMinutes += minsRead; // รวมเวลาเรียนเพิ่มขึ้น
+        document.getElementById('userPointsDisplay').innerText = userPoints;
+        
+        // 1. อัปเดตข้อมูลรวมลงในตาราง profiles
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({ 
+            points: userPoints,
+            total_study_time: totalStudyMinutes,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', currentUser.id);
 
-          if (error) {
-            console.error('Error saving points:', error.message);
-          } else {
-            alert(`🎉 ยินดีด้วย! คุณอ่านหนังสือครบช่วงเวลาแล้ว ได้รับ +${pointsEarned} Points!`);
-          }
-        } else {
-          alert('🎉 ยินดีด้วย! คุณอ่านหนังสือครบช่วงเวลาแล้ว');
+        if (profileError) {
+          console.error('Error updating profile:', profileError.message);
         }
+
+        // 2. บันทึกรายละเอียดรอบลงตาราง study_logs (ถ้ามีตารางนี้อยู่)
+        try {
+          await supabase.from('study_logs').insert([
+            {
+              user_id: currentUser.id,
+              technique: currentTechnique,
+              duration_minutes: minsRead,
+              points_earned: pointsEarned,
+              created_at: new Date().toISOString()
+            }
+          ]);
+        } catch (e) {
+          console.log('Log table missing or non-critical error:', e);
+        }
+
+        alert(`🎉 ยินดีด้วย! คุณอ่านหนังสือครบช่วงเวลา ${minsRead} นาทีแล้ว!\nได้รับ +${pointsEarned} Points!`);
 
         if (breakDuration > 0) {
           isBreak = true;
