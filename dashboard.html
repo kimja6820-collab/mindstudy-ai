@@ -3,20 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MindStudy AI - หน้าหลัก</title>
+  <title>MindStudy AI - หน้าหลัก (Dashboard)</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 font-sans min-h-screen flex flex-col">
 
-  <!-- 1. Navigation Bar -->
+  <!-- Navigation Bar -->
   <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16 items-center">
-        <!-- Logo & Navigation Links -->
         <div class="flex items-center space-x-8">
-          <span class="text-2xl font-extrabold text-indigo-600 flex items-center gap-2">
-            🧠 MindStudy AI
-          </span>
+          <span class="text-2xl font-extrabold text-indigo-600 flex items-center gap-2">🧠 MindStudy AI</span>
           <div class="hidden md:flex space-x-4">
             <a href="dashboard.html" class="text-indigo-600 font-bold px-3 py-2 rounded-lg bg-indigo-50">หน้าหลัก</a>
             <a href="timer.html" class="text-slate-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-lg transition">จับเวลาเรียน</a>
@@ -24,234 +21,207 @@
             <a href="minigame.html" class="text-slate-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-lg transition">มินิเกมห้องพิกเซล</a>
           </div>
         </div>
-
-        <!-- Right Menu: User Profile & Points -->
         <div class="relative group">
           <button class="flex items-center space-x-3 bg-slate-100 hover:bg-indigo-50 p-2 rounded-full border border-slate-200 transition">
-            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm" id="userAvatar">
-              U
-            </div>
+            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm" id="userAvatar">U</div>
             <span class="text-sm font-semibold text-slate-700 pr-2 hidden sm:inline" id="userEmailDisplay">Loading...</span>
           </button>
-
-          <!-- Hover Dropdown Modal -->
           <div class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 hidden group-hover:block transition-all duration-200 z-50">
             <div class="text-xs text-slate-400 font-medium">คะแนนสะสมของคุณ</div>
-            <div class="text-2xl font-black text-amber-500 my-1 flex items-center gap-1">
-              ⭐ <span id="userPointsDisplay">0</span> <span class="text-xs font-normal text-slate-500">Points</span>
-            </div>
+            <div class="text-2xl font-black text-amber-500 my-1 flex items-center gap-1">⭐ <span id="navUserPoints">0</span> <span class="text-xs font-normal text-slate-500">Points</span></div>
             <hr class="my-3 border-slate-100">
-            <button onclick="window.handleLogout()" class="w-full text-left text-sm font-semibold text-rose-500 hover:bg-rose-50 p-2 rounded-xl transition">
-              🚪 ออกจากระบบ
-            </button>
+            <button onclick="window.handleLogout()" class="w-full text-left text-sm font-semibold text-rose-500 hover:bg-rose-50 p-2 rounded-xl transition">🚪 ออกจากระบบ</button>
           </div>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- Main Content -->
+  <!-- Main Content Dashboard -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 space-y-8">
-
-    <!-- Section 1: Summary Stats -->
-    <section class="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-3xl p-6 text-white shadow-lg">
-      <h2 class="text-xl font-bold mb-4">📊 สรุปเวลาอ่านหนังสือสัปดาห์นี้</h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
-          <div class="text-xs text-indigo-100">อ่านวันนี้</div>
-          <div class="text-2xl font-extrabold mt-1" id="todayStudyTime">0 นาที</div>
-        </div>
-        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
-          <div class="text-xs text-indigo-100">รวมสัปดาห์นี้</div>
-          <div class="text-2xl font-extrabold mt-1" id="weeklyStudyTime">0 ชม.</div>
-        </div>
-        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
-          <div class="text-xs text-indigo-100">เป้าหมายสัปดาห์นี้</div>
-          <div class="text-2xl font-extrabold mt-1">10 ชม.</div>
-        </div>
-        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
-          <div class="text-xs text-indigo-100">Point ที่ได้รับ</div>
-          <div class="text-2xl font-extrabold text-amber-300 mt-1" id="earnedPoints">0 PT</div>
-        </div>
+    
+    <!-- Welcome Banner -->
+    <div class="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-black">ยินดีต้อนรับกลับมา! 👋</h1>
+        <p class="text-indigo-100 text-sm mt-1">วันนี้พร้อมสำหรับการเรียนรู้และเก็บสะสม Points เพิ่มเติมแล้วหรือยัง?</p>
       </div>
-    </section>
+      <a href="timer.html" class="bg-white text-indigo-600 font-bold px-6 py-3 rounded-2xl shadow hover:bg-indigo-50 transition flex items-center gap-2">
+        ⏱️ เริ่มจับเวลาเรียน
+      </a>
+    </div>
 
-    <!-- Section 2: Stress Assessment & Diary -->
-    <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       
-      <!-- Write Entry Form (2 Cols) -->
-      <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
-        <div class="flex justify-between items-center">
-          <div>
-            <h2 class="text-xl font-bold text-slate-800">📝 แบบประเมินความเครียด & ไดอารี่วันนี้</h2>
-            <p class="text-xs text-slate-400 mt-1">บันทึกความรู้สึกได้สูงสุด 3 ครั้ง/วัน</p>
-          </div>
-          <span class="text-xs font-bold px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full" id="dailyLimitBadge">
-            โควต้าวันนี้: 0/3
-          </span>
+      <!-- Card 1: Total Points -->
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-3xl">
+          ⭐
         </div>
-
-        <!-- Mood Selector -->
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-2">1. ระดับความเครียด/ความรู้สึกขณะนี้</label>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="stressOptions">
-            <button type="button" onclick="window.selectStress('สบายๆ', '😊')" class="stress-btn p-3 border-2 border-slate-100 rounded-2xl text-left hover:border-emerald-400 transition" data-level="สบายๆ">
-              <span class="text-2xl">😊</span>
-              <div class="font-bold text-slate-700 text-sm mt-1">สบายๆ</div>
-              <div class="text-[10px] text-slate-400">พร้อมลุยอ่าน</div>
-            </button>
-            <button type="button" onclick="window.selectStress('กังวลนิดหน่อย', '😐')" class="stress-btn p-3 border-2 border-slate-100 rounded-2xl text-left hover:border-amber-400 transition" data-level="กังวลนิดหน่อย">
-              <span class="text-2xl">😐</span>
-              <div class="font-bold text-slate-700 text-sm mt-1">กังวลนิดหน่อย</div>
-              <div class="text-[10px] text-slate-400">พอรับมือไหว</div>
-            </button>
-            <button type="button" onclick="window.selectStress('เครียดมาก', '😰')" class="stress-btn p-3 border-2 border-slate-100 rounded-2xl text-left hover:border-orange-400 transition" data-level="เครียดมาก">
-              <span class="text-2xl">😰</span>
-              <div class="font-bold text-slate-700 text-sm mt-1">เครียดมาก</div>
-              <div class="text-[10px] text-slate-400">เริ่มอึดอัด</div>
-            </button>
-            <button type="button" onclick="window.selectStress('เครียดที่สุด', '😫')" class="stress-btn p-3 border-2 border-slate-100 rounded-2xl text-left hover:border-rose-400 transition" data-level="เครียดที่สุด">
-              <span class="text-2xl">😫</span>
-              <div class="font-bold text-slate-700 text-sm mt-1">เครียดที่สุด</div>
-              <div class="text-[10px] text-slate-400">จะไม่ไหวแล้ว</div>
-            </button>
-          </div>
-        </div>
-
-        <!-- Diary Textarea -->
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-2">2. เล่าความรู้สึกหรือสิ่งที่เจอในวันนี้ (ไดอารี่)</label>
-          <textarea id="diaryInput" rows="4" placeholder="วันนี้รู้สึกอย่างไรบ้าง มีเรื่องอะไรกังวลใจไหม..." class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-400 text-sm"></textarea>
-        </div>
-
-        <button id="saveDiaryBtn" onclick="window.handleSaveDiary()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-2xl transition shadow-md">
-          บันทึกไดอารี่
-        </button>
-      </div>
-
-      <!-- History Sidebar (1 Col) -->
-      <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col">
-        <h2 class="text-xl font-bold text-slate-800 mb-4">📜 ประวัติบันทึกย้อนหลัง</h2>
-        <div id="historyList" class="space-y-4 overflow-y-auto max-h-[420px] pr-1 flex-1">
-          <p class="text-slate-400 text-sm text-center py-8">ยังไม่มีประวัติบันทึก</p>
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Points สะสมทั้งหมด</div>
+          <div class="text-3xl font-black text-slate-800 mt-0.5" id="dashUserPoints">0</div>
         </div>
       </div>
 
-    </section>
+      <!-- Card 2: Total Study Time -->
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-3xl">
+          ⏳
+        </div>
+        <div>
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">เวลาเรียนรวมทั้งหมด</div>
+          <div class="text-3xl font-black text-slate-800 mt-0.5" id="dashTotalStudyTime">0 นาที</div>
+        </div>
+      </div>
+
+      <!-- Card 3: Total Sessions -->
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl">
+          📚
+        </div>
+        <div>
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">จำนวนรอบที่เรียนสำเร็จ</div>
+          <div class="text-3xl font-black text-slate-800 mt-0.5" id="dashTotalSessions">0 รอบ</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Recent History Table -->
+    <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+      <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+        📋 ประวัติการเรียนล่าสุด
+      </h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-600">
+          <thead class="bg-slate-50 text-slate-400 font-bold uppercase text-xs">
+            <tr>
+              <th class="p-3 rounded-l-xl">วันที่/เวลา</th>
+              <th class="p-3">เทคนิคที่ใช้</th>
+              <th class="p-3">ระยะเวลา (นาที)</th>
+              <th class="p-3 rounded-r-xl">Points ที่ได้รับ</th>
+            </tr>
+          </thead>
+          <tbody id="recentSessionsTable">
+            <tr>
+              <td colspan="4" class="p-4 text-center text-slate-400">กำลังโหลดข้อมูล...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </main>
 
   <script type="module">
     import { supabase } from './js/supabase-config.js';
 
-    let selectedStress = '';
-    let selectedEmoji = '';
     let currentUser = null;
-    let userPoints = 0;
 
-    // ตรวจสอบ Session เมื่อเปิดหน้าเว็บ
     window.addEventListener('DOMContentLoaded', async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        window.location.href = 'index.html';
-        return;
-      }
-      currentUser = user;
-      document.getElementById('userEmailDisplay').innerText = user.email;
-      document.getElementById('userAvatar').innerText = user.email.charAt(0).toUpperCase();
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error || !user) {
+          window.location.href = 'index.html';
+          return;
+        }
+        currentUser = user;
+        document.getElementById('userEmailDisplay').innerText = user.email;
+        document.getElementById('userAvatar').innerText = user.email ? user.email.charAt(0).toUpperCase() : 'U';
 
-      await loadUserData();
-      await loadTodayDiaries();
+        // โหลดสถิติทั้ง Points และเวลาเรียน
+        await loadDashboardData();
+      } catch (err) {
+        console.error('Dashboard Auth Error:', err);
+        window.location.href = 'index.html';
+      }
     });
 
-    // ดึงข้อมูล Points จาก Database
-    async function loadUserData() {
-      const { data, error } = await supabase.from('profiles').select('points').eq('id', currentUser.id).single();
-      if (data) {
-        userPoints = data.points || 0;
-        document.getElementById('userPointsDisplay').innerText = userPoints;
-      }
-    }
+    async function loadDashboardData() {
+      // 1. ดึงคะแนน Points จาก profiles
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('points')
+        .eq('id', currentUser.id)
+        .single();
 
-    // เลือกความเครียด
-    window.selectStress = function(level, emoji) {
-      selectedStress = level;
-      selectedEmoji = emoji;
-      document.querySelectorAll('.stress-btn').forEach(btn => {
-        btn.classList.remove('border-indigo-600', 'bg-indigo-50');
-      });
-      event.currentTarget.classList.add('border-indigo-600', 'bg-indigo-50');
-    };
+      const userPoints = profile ? (parseFloat(profile.points) || 0) : 0;
+      document.getElementById('navUserPoints').innerText = userPoints;
+      document.getElementById('dashUserPoints').innerText = userPoints;
 
-    // บันทึก ไดอารี่ + แบบประเมิน
-    window.handleSaveDiary = async function() {
-      const diaryText = document.getElementById('diaryInput').value.trim();
-      if (!selectedStress) return alert('กรุณาเลือกระดับความเครียด');
-      if (!diaryText) return alert('กรุณากรอกข้อความไดอารี่');
-
-      // ตรวจสอบโควต้า 3 ครั้ง/วัน
-      const today = new Date().toISOString().split('T')[0];
-      const { data: todayEntries, error: countErr } = await supabase
-        .from('diaries')
-        .select('id')
-        .eq('user_id', currentUser.id)
-        .gte('created_at', `${today}T00:00:00`);
-
-      if (todayEntries && todayEntries.length >= 3) {
-        return alert('คุณบันทึกไดอารี่ครบ 3 ครั้งสำหรับวันนี้แล้วครับ');
-      }
-
-      // บันทึกลง Supabase
-      const { error } = await supabase.from('diaries').insert([{
-        user_id: currentUser.id,
-        stress_level: selectedStress,
-        emoji: selectedEmoji,
-        content: diaryText
-      }]);
-
-      if (error) {
-        alert('เกิดข้อผิดพลาด: ' + error.message);
-      } else {
-        alert('บันทึกไดอารี่สำเร็จ!');
-        document.getElementById('diaryInput').value = '';
-        await loadTodayDiaries();
-      }
-    };
-
-    // โหลดประวัติย้อนหลัง
-    async function loadTodayDiaries() {
-      const { data, error } = await supabase
-        .from('diaries')
+      // 2. ดึงประวัติการเรียนทั้งหมดจาก study_sessions
+      const { data: sessions, error: sessionErr } = await supabase
+        .from('study_sessions')
         .select('*')
         .eq('user_id', currentUser.id)
         .order('created_at', { ascending: false });
 
-      const historyContainer = document.getElementById('historyList');
-      const today = new Date().toISOString().split('T')[0];
-
-      if (data) {
-        const todayCount = data.filter(item => item.created_at.startsWith(today)).length;
-        document.getElementById('dailyLimitBadge').innerText = `โควต้าวันนี้: ${todayCount}/3`;
-
-        if (data.length === 0) {
-          historyContainer.innerHTML = `<p class="text-slate-400 text-sm text-center py-8">ยังไม่มีประวัติบันทึก</p>`;
-          return;
-        }
-
-        historyContainer.innerHTML = data.map(item => `
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-            <div class="flex justify-between items-center text-xs">
-              <span class="font-bold text-indigo-600 flex items-center gap-1">
-                ${item.emoji || '📝'} ${item.stress_level}
-              </span>
-              <span class="text-slate-400">${new Date(item.created_at).toLocaleString('th-TH')}</span>
-            </div>
-            <p class="text-sm text-slate-700 font-medium">${item.content}</p>
-          </div>
-        `).join('');
+      if (sessionErr) {
+        console.error('Error fetching study_sessions:', sessionErr.message);
+        return;
       }
+
+      // 3. คำนวณเวลารวม และจำนวนรอบ
+      let totalMinutes = 0;
+      let sessionCount = 0;
+
+      if (sessions && sessions.length > 0) {
+        sessionCount = sessions.length;
+        totalMinutes = sessions.reduce((acc, curr) => acc + (parseInt(curr.duration_minutes) || 0), 0);
+        
+        // แสดงผลตารางประวัติ 5 รายการล่าสุด
+        renderRecentSessions(sessions.slice(0, 5));
+      } else {
+        document.getElementById('recentSessionsTable').innerHTML = `
+          <tr>
+            <td colspan="4" class="p-4 text-center text-slate-400">ยังไม่มีประวัติการเรียน เริ่มจับเวลาเลย!</td>
+          </tr>
+        `;
+      }
+
+      // แสดงผลเวลาเรียนรวม (ถ้าเกิน 60 นาที แปลงเป็น ชม. นาที)
+      if (totalMinutes >= 60) {
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+        document.getElementById('dashTotalStudyTime').innerText = `${hours} ชม. ${mins} นาที`;
+      } else {
+        document.getElementById('dashTotalStudyTime').innerText = `${totalMinutes} นาที`;
+      }
+
+      document.getElementById('dashTotalSessions').innerText = `${sessionCount} รอบ`;
     }
 
-    // ออกจากระบบ
+    function renderRecentSessions(sessionsList) {
+      const tbody = document.getElementById('recentSessionsTable');
+      tbody.innerHTML = '';
+
+      const techNames = {
+        pomodoro: '🍅 โพโมโดโร',
+        '52_17': '📊 52/17',
+        '90_min': '🧠 90 นาที',
+        custom: '🎯 กำหนดเอง'
+      };
+
+      sessionsList.forEach(item => {
+        const dateStr = new Date(item.created_at).toLocaleString('th-TH', {
+          dateStyle: 'short',
+          timeStyle: 'short'
+        });
+
+        const row = document.createElement('tr');
+        row.className = 'border-b border-slate-100 hover:bg-slate-50';
+        row.innerHTML = `
+          <td class="p-3 text-slate-500">${dateStr}</td>
+          <td class="p-3 font-semibold text-slate-700">${techNames[item.technique] || item.technique}</td>
+          <td class="p-3 font-bold text-indigo-600">${item.duration_minutes} นาที</td>
+          <td class="p-3 font-bold text-amber-500">+${item.points_earned || 0}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
     window.handleLogout = async function() {
       await supabase.auth.signOut();
       window.location.href = 'index.html';
