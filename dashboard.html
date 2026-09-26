@@ -53,26 +53,15 @@
   <!-- Main Content -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 space-y-8">
 
-    <!-- Section 1: Summary Stats -->
+    <!-- Section 1: Points Summary Stat -->
     <section class="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-3xl p-6 text-white shadow-lg">
-      <h2 class="text-xl font-bold mb-4">📊 สรุปเวลาอ่านหนังสือสัปดาห์นี้</h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
-          <div class="text-xs text-indigo-100">อ่านวันนี้</div>
-          <div class="text-2xl font-extrabold mt-1" id="todayStudyTime">0 นาที</div>
+      <h2 class="text-xl font-bold mb-4">⭐ คะแนนสะสมของคุณ</h2>
+      <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 flex items-center justify-between">
+        <div>
+          <div class="text-sm text-indigo-100 font-medium">Point ที่ได้รับสะสมทั้งหมด</div>
+          <div class="text-4xl font-extrabold text-amber-300 mt-1" id="earnedPoints">0 PT</div>
         </div>
-        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
-          <div class="text-xs text-indigo-100">รวมสัปดาห์นี้</div>
-          <div class="text-2xl font-extrabold mt-1" id="weeklyStudyTime">0 ชม.</div>
-        </div>
-        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
-          <div class="text-xs text-indigo-100">เป้าหมายสัปดาห์นี้</div>
-          <div class="text-2xl font-extrabold mt-1">10 ชม.</div>
-        </div>
-        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
-          <div class="text-xs text-indigo-100">Point ที่ได้รับ</div>
-          <div class="text-2xl font-extrabold text-amber-300 mt-1" id="earnedPoints">0 PT</div>
-        </div>
+        <div class="text-5xl">🏆</div>
       </div>
     </section>
 
@@ -146,7 +135,6 @@
     let selectedStress = '';
     let selectedEmoji = '';
     let currentUser = null;
-    let userPoints = 0;
 
     // ตรวจสอบ Session เมื่อเปิดหน้าเว็บ
     window.addEventListener('DOMContentLoaded', async () => {
@@ -160,7 +148,6 @@
       document.getElementById('userAvatar').innerText = user.email ? user.email.charAt(0).toUpperCase() : 'U';
 
       await loadUserData();
-      await loadStudyStats(); // ดึงข้อมูลเวลาเรียนมาคำนวณสถิติ
       await loadTodayDiaries();
     });
 
@@ -173,66 +160,9 @@
         .single();
 
       if (data && !error) {
-        userPoints = parseFloat(data.points) || 0;
-        document.getElementById('userPointsDisplay').innerText = userPoints;
-        document.getElementById('earnedPoints').innerText = `${userPoints} PT`;
-      }
-    }
-
-    // ดึงเวลาเรียนจากตาราง study_sessions มาคำนวณสถิติ (แก้ไขเรื่อง Date/Timezone)
-    async function loadStudyStats() {
-      const { data: sessions, error } = await supabase
-        .from('study_sessions')
-        .select('duration_minutes, created_at')
-        .eq('user_id', currentUser.id);
-
-      if (error) {
-        console.error('Error fetching study sessions:', error);
-        return;
-      }
-
-      if (!sessions || sessions.length === 0) {
-        document.getElementById('todayStudyTime').innerText = `0 นาที`;
-        document.getElementById('weeklyStudyTime').innerText = `0 ชม.`;
-        return;
-      }
-
-      const now = new Date();
-      // หาวันเริ่มของวันนี้ (00:00:00)
-      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-      // หาวันแรกของสัปดาห์ปัจจุบัน (วันอาทิตย์ เวลา 00:00:00)
-      const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
-
-      let todayMinutes = 0;
-      let weeklyMinutes = 0;
-
-      sessions.forEach(session => {
-        if (!session.created_at) return;
-
-        const sessionDate = new Date(session.created_at);
-        const duration = parseInt(session.duration_minutes) || 0;
-
-        // คำนวณเวลาอ่านวันนี้
-        if (sessionDate >= startOfToday) {
-          todayMinutes += duration;
-        }
-
-        // คำนวณเวลาอ่านรวมสัปดาห์นี้
-        if (sessionDate >= startOfWeek) {
-          weeklyMinutes += duration;
-        }
-      });
-
-      // แสดงผลเวลาอ่านวันนี้
-      document.getElementById('todayStudyTime').innerText = `${todayMinutes} นาที`;
-
-      // แสดงผลเวลาอ่านสัปดาห์นี้
-      if (weeklyMinutes >= 60) {
-        const hours = (weeklyMinutes / 60).toFixed(1);
-        document.getElementById('weeklyStudyTime').innerText = `${hours} ชม.`;
-      } else {
-        document.getElementById('weeklyStudyTime').innerText = `${weeklyMinutes} นาที`;
+        const points = parseFloat(data.points) || 0;
+        document.getElementById('userPointsDisplay').innerText = points;
+        document.getElementById('earnedPoints').innerText = `${points} PT`;
       }
     }
 
