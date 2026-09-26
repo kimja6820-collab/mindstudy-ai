@@ -132,7 +132,7 @@
         </div>
 
         <div class="mt-4 text-center">
-          <p class="text-xs text-slate-400">✨ กดทำภารกิจด้านขวาเพื่อสะสม Points แล้วซื้อของมาแต่งห้องกัน!</p>
+          <p class="text-xs text-slate-400">✨ กดทำภารกิจประจำวันด้านขวาเพื่อสุ่มรับ Points แล้วซื้อของมาแต่งห้องกัน!</p>
         </div>
       </div>
 
@@ -143,9 +143,9 @@
         <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
-              🎯 ภารกิจรับ Points
+              🎯 ภารกิจประจำวัน
             </h2>
-            <span class="text-xs text-slate-400 font-bold">ทำได้ไม่จำกัด</span>
+            <span class="text-xs text-slate-400 font-bold">สิทธิ์ 1 ครั้ง/วัน</span>
           </div>
           <div class="space-y-3" id="taskList">
             <!-- Tasks JS Rendered -->
@@ -176,18 +176,18 @@
     let userUnlockedItems = [];
 
     const shopItems = [
-      { id: 'lamp', name: 'โคมไฟอ่านหนังสือ', price: 50, icon: '💡', desc: 'เพิ่มแสงสว่างบนโต๊ะ' },
-      { id: 'plant', name: 'ต้นไม้มงคลพิกเซล', price: 100, icon: '🪴', desc: 'ประดับข้างโต๊ะเรียน' },
-      { id: 'coffee', name: 'กาแฟร้อนแก้วโปรด', price: 150, icon: '☕', desc: 'วางเพิ่มพลังยามดึก' },
-      { id: 'cat', name: 'แมวส้มจอมขี้เกียจ', price: 200, icon: '🐱', desc: 'นั่งเฝ้าโต๊ะเป็นเพื่อน' },
-      { id: 'bookshelf', name: 'ชั้นวางตำราเรียน', price: 300, icon: '📚', desc: 'แขวนผนังห้องอ่านหนังสือ' },
-      { id: 'trophy', name: 'ถ้วยรางวัลเรียนดี', price: 500, icon: '🏆', desc: 'ประดับผนังเพิ่มความภูมิใจ' }
+      { id: 'lamp', name: 'โคมไฟอ่านหนังสือ', price: 15, icon: '💡', desc: 'เพิ่มแสงสว่างบนโต๊ะ' },
+      { id: 'plant', name: 'ต้นไม้มงคลพิกเซล', price: 25, icon: '🪴', desc: 'ประดับข้างโต๊ะเรียน' },
+      { id: 'coffee', name: 'กาแฟร้อนแก้วโปรด', price: 30, icon: '☕', desc: 'วางเพิ่มพลังยามดึก' },
+      { id: 'cat', name: 'แมวส้มจอมขี้เกียจ', price: 50, icon: '🐱', desc: 'นั่งเฝ้าโต๊ะเป็นเพื่อน' },
+      { id: 'bookshelf', name: 'ชั้นวางตำราเรียน', price: 80, icon: '📚', desc: 'แขวนผนังห้องอ่านหนังสือ' },
+      { id: 'trophy', name: 'ถ้วยรางวัลเรียนดี', price: 120, icon: '🏆', desc: 'ประดับผนังเพิ่มความภูมิใจ' }
     ];
 
     const dailyTasks = [
-      { id: 'task_water', name: 'รดน้ำต้นไม้พักสายตา', points: 20, icon: '💧' },
-      { id: 'task_clean', name: 'จัดโต๊ะอ่านหนังสือ', points: 30, icon: '🧹' },
-      { id: 'task_feed', name: 'ให้อาหารสัตว์เลี้ยง', points: 25, icon: '🐟' }
+      { id: 'task_water', name: 'รดน้ำต้นไม้พักสายตา', icon: '💧' },
+      { id: 'task_clean', name: 'จัดโต๊ะอ่านหนังสือ', icon: '🧹' },
+      { id: 'task_feed', name: 'ให้อาหารสัตว์เลี้ยง', icon: '🐟' }
     ];
 
     window.addEventListener('DOMContentLoaded', async () => {
@@ -211,7 +211,6 @@
       }
     });
 
-    // โหลดข้อมูลอย่างปลอดภัย ป้องกันปัญหา Data Format
     async function loadProfileData() {
       const { data, error } = await supabase
         .from('profiles')
@@ -222,7 +221,6 @@
       if (data && !error) {
         userPoints = Number(data.points) || 0;
         
-        // แปลงรูปแบบการจัดเก็บให้อยู่ใน Array เสมอ
         if (Array.isArray(data.unlocked_items)) {
           userUnlockedItems = data.unlocked_items;
         } else if (typeof data.unlocked_items === 'string') {
@@ -261,23 +259,40 @@
       });
     }
 
+    // หาวันที่ปัจจุบัน รูปแบบ YYYY-MM-DD
+    function getTodayString() {
+      const today = new Date();
+      return today.toISOString().split('T')[0];
+    }
+
     function renderTasks() {
       const container = document.getElementById('taskList');
       container.innerHTML = '';
+      const todayStr = getTodayString();
 
       dailyTasks.forEach(task => {
+        // เช็กว่าวันนี้ทำภารกิจนี้ไปแล้วหรือยัง
+        const lastDoneDate = localStorage.getItem(`task_${task.id}_${currentUser.id}`);
+        const isDoneToday = (lastDoneDate === todayStr);
+
         container.innerHTML += `
           <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between hover:bg-slate-100/80 transition">
             <div class="flex items-center gap-3">
               <span class="text-2xl">${task.icon}</span>
               <div>
                 <div class="text-xs font-bold text-slate-800">${task.name}</div>
-                <div class="text-[11px] font-extrabold text-amber-600">+${task.points} Points</div>
+                <div class="text-[11px] font-extrabold text-amber-600">🎲 สุ่ม +1 ถึง 10 Points</div>
               </div>
             </div>
-            <button onclick="window.claimTaskPoints(${task.points})" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm active:scale-95">
-              ทำภารกิจ
-            </button>
+            ${isDoneToday ? `
+              <button disabled class="px-3.5 py-2 bg-slate-200 text-slate-400 rounded-xl text-xs font-bold cursor-not-allowed">
+                ✓ ทำแล้ววันนี้
+              </button>
+            ` : `
+              <button onclick="window.claimTaskPoints('${task.id}')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm active:scale-95">
+                ทำภารกิจ
+              </button>
+            `}
           </div>
         `;
       });
@@ -314,9 +329,19 @@
       });
     }
 
-    // บันทึก Points
-    window.claimTaskPoints = async function(addedPoints) {
-      const newPoints = Number(userPoints) + Number(addedPoints);
+    // ฟังก์ชันสุ่ม Points 1-10 และบันทึกวันที่ทำภารกิจ
+    window.claimTaskPoints = async function(taskId) {
+      const todayStr = getTodayString();
+      const lastDoneDate = localStorage.getItem(`task_${taskId}_${currentUser.id}`);
+
+      if (lastDoneDate === todayStr) {
+        alert('คุณทำภารกิจนี้ไปแล้วในวันนี้ กลับมาทำใหม่พรุ่งนี้นะ!');
+        return;
+      }
+
+      // สุ่มแต้ม 1 - 10
+      const randomPoints = Math.floor(Math.random() * 10) + 1;
+      const newPoints = Number(userPoints) + randomPoints;
 
       const { error } = await supabase
         .from('profiles')
@@ -325,13 +350,17 @@
 
       if (!error) {
         userPoints = newPoints;
+        // บันทึกว่าวันนี้ทำภารกิจนี้ไปแล้ว
+        localStorage.setItem(`task_${taskId}_${currentUser.id}`, todayStr);
+        
+        alert(`🎉 ยินดีด้วย! คุณสุ่มได้ +${randomPoints} Points`);
         updatePointsUI();
+        renderTasks(); // รีเรนเดอร์เพื่อล็อกปุ่ม
       } else {
         alert('เกิดข้อผิดพลาดในการบันทึกแต้ม: ' + error.message);
       }
     };
 
-    // บันทึกการซื้อไอเทม
     window.buyShopItem = async function(itemId, price) {
       if (Number(userPoints) < Number(price)) {
         alert('❌ Points ไม่เพียงพอ!');
@@ -359,7 +388,7 @@
         renderPixelRoom();
         alert('🎉 ปลดล็อกไอเทมสำเร็จ!');
       } else {
-        alert('❌ ไม่สามารถซื้อสินค้าได้: ' + error.message + '\n(โปรดตรวจสอบว่าได้รัน SQL Command ใน Supabase แล้วหรือยัง)');
+        alert('❌ ไม่สามารถซื้อสินค้าได้: ' + error.message);
       }
     };
 
