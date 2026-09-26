@@ -3,80 +3,280 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MindStudy AI - ปฏิทินการเรียน</title>
+  <title>MindStudy AI - ปฏิทินวางแผน & วันหยุด 2569</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen p-4 md:p-8">
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col">
 
-  <div class="max-w-2xl mx-auto space-y-6">
-    <header class="flex justify-between items-center bg-white p-4 rounded-2xl border">
-      <a href="dashboard.html" class="text-sm font-bold text-indigo-600">← กลับแดชบอร์ด</a>
-      <h1 class="font-bold text-slate-700">วางแผนตารางเรียน</h1>
-    </header>
-
-    <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
-      <h2 class="font-bold text-slate-700">➕ เพิ่มเป้าหมายการอ่านหนังสือ</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <input id="eventTitle" type="text" placeholder="หัวข้อที่จะอ่าน..." class="p-3 border rounded-xl text-sm outline-none">
-        <input id="eventDate" type="date" class="p-3 border rounded-xl text-sm outline-none">
+  <!-- Navigation Bar -->
+  <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16 items-center">
+        <div class="flex items-center space-x-8">
+          <span class="text-2xl font-extrabold text-indigo-600 flex items-center gap-2">🧠 MindStudy AI</span>
+          <div class="hidden md:flex space-x-4">
+            <a href="dashboard.html" class="text-slate-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-lg transition">หน้าหลัก</a>
+            <a href="timer.html" class="text-slate-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-lg transition">จับเวลาเรียน</a>
+            <a href="calendar.html" class="text-indigo-600 font-bold px-3 py-2 rounded-lg bg-indigo-50">ปฏิทินวางแผน</a>
+            <a href="minigame.html" class="text-slate-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-lg transition">มินิเกมห้องพิกเซล</a>
+          </div>
+        </div>
+        <div class="relative group">
+          <button class="flex items-center space-x-3 bg-slate-100 hover:bg-indigo-50 p-2 rounded-full border border-slate-200 transition">
+            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm" id="userAvatar">U</div>
+            <span class="text-sm font-semibold text-slate-700 pr-2 hidden sm:inline" id="userEmailDisplay">Loading...</span>
+          </button>
+          <div class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 hidden group-hover:block transition-all duration-200 z-50">
+            <div class="text-xs text-slate-400 font-medium">คะแนนสะสมของคุณ</div>
+            <div class="text-2xl font-black text-amber-500 my-1 flex items-center gap-1">⭐ <span id="userPointsDisplay">0</span> <span class="text-xs font-normal text-slate-500">Points</span></div>
+            <hr class="my-3 border-slate-100">
+            <button onclick="window.handleLogout()" class="w-full text-left text-sm font-semibold text-rose-500 hover:bg-rose-50 p-2 rounded-xl transition">🚪 ออกจากระบบ</button>
+          </div>
+        </div>
       </div>
-      <button onclick="addEvent()" class="w-full bg-indigo-600 text-white font-bold py-2 rounded-xl text-sm hover:bg-indigo-700">บันทึกลงปฏิทิน</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 space-y-8">
+    
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h1 class="text-3xl font-black text-slate-800">📅 ปฏิทินวางแผน & วันหยุด 2569</h1>
+        <p class="text-sm text-slate-500 mt-1">เช็กวันหยุดราชการ วันสำคัญ และวางแผนการอ่านหนังสือของคุณ</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="window.changeMonth(-1)" class="p-2.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-2xl shadow-sm text-slate-600 font-bold transition">◀</button>
+        <span id="currentMonthYear" class="text-lg font-extrabold text-slate-800 bg-white px-6 py-2 rounded-2xl border border-slate-200 shadow-sm min-w-[180px] text-center">
+          มกราคม 2569
+        </span>
+        <button onclick="window.changeMonth(1)" class="p-2.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-2xl shadow-sm text-slate-600 font-bold transition">▶</button>
+      </div>
     </div>
 
-    <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
-      <h2 class="font-bold text-slate-700">📌 ตารางกิจกรรมที่วางแผนไว้</h2>
-      <div id="eventList" class="space-y-2 text-sm">กำลังโหลดข้อมูล...</div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Calendar Grid (2 Cols) -->
+      <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+        <!-- Days Header -->
+        <div class="grid grid-cols-7 gap-2 text-center font-bold text-xs text-slate-400 mb-4">
+          <div class="text-rose-500">อา.</div>
+          <div>จ.</div>
+          <div>อ.</div>
+          <div>พ.</div>
+          <div>พฤ.</div>
+          <div>ศ.</div>
+          <div class="text-indigo-600">ส.</div>
+        </div>
+
+        <!-- Days Grid -->
+        <div id="calendarGrid" class="grid grid-cols-7 gap-2">
+          <!-- Calendar Days JS Generated -->
+        </div>
+      </div>
+
+      <!-- Holidays & Events Sidebar (1 Col) -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+            🎈 วันหยุด & วันสำคัญ
+          </h2>
+          <p class="text-xs text-slate-400 mt-1" id="holidayMonthLabel">ประจำเดือนมกราคม 2569</p>
+        </div>
+
+        <div id="holidaysList" class="space-y-3 overflow-y-auto max-h-[500px] pr-1 flex-1">
+          <!-- Holidays JS Generated -->
+        </div>
+      </div>
+
     </div>
-  </div>
+
+  </main>
 
   <script type="module">
     import { supabase } from './js/supabase-config.js';
 
     let currentUser = null;
+    let currentDate = new Date(2026, 0, 1); // เริ่มต้นที่ มกราคม 2569 (2026)
 
-    async function init() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) window.location.href = 'index.html';
-      currentUser = user;
-      loadEvents();
+    // ข้อมูลวันหยุดและวันสำคัญปี 2569 (2026)
+    const holidays2026 = [
+      // มกราคม
+      { date: '2026-01-01', title: 'วันขึ้นปีใหม่', type: 'official' },
+      { date: '2026-01-02', title: 'วันหยุดพิเศษ', type: 'official' },
+      
+      // กุมภาพันธ์
+      { date: '2026-02-17', title: 'วันตรุษจีน', type: 'cultural' },
+
+      // มีนาคม
+      { date: '2026-03-03', title: 'วันมาฆบูชา', type: 'official' },
+
+      // เมษายน
+      { date: '2026-04-05', title: 'วันเช็งเม้ง', type: 'cultural' },
+      { date: '2026-04-06', title: 'วันจักรี (วันพระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลกมหาราช)', type: 'official' },
+      { date: '2026-04-13', title: 'วันสงกรานต์ (วันผู้สูงอายุ)', type: 'official' },
+      { date: '2026-04-14', title: 'วันสงกรานต์ (วันครอบครัว)', type: 'official' },
+      { date: '2026-04-15', title: 'วันสงกรานต์ (วันเถลิงศก)', type: 'official' },
+
+      // พฤษภาคม
+      { date: '2026-05-01', title: 'วันแรงงานแห่งชาติ', type: 'official' },
+      { date: '2026-05-04', title: 'วันฉัตรมงคล', type: 'official' },
+      { date: '2026-05-09', title: 'วันพืชมงคล (หยุดเฉพาะข้าราชการ)', type: 'official' },
+      { date: '2026-05-31', title: 'วันวิสาขบูชา', type: 'official' },
+
+      // มิถุนายน
+      { date: '2026-06-01', title: 'หยุดชดเชย วันวิสาขบูชา', type: 'official' },
+      { date: '2026-06-03', title: 'วันเฉลิมพระชนมพรรษา สมเด็จพระนางเจ้าสุทิดาฯ พระบรมราชินี', type: 'official' },
+
+      // กรกฎาคม
+      { date: '2026-07-28', title: 'วันเฉลิมพระชนมพรรษา พระบาทสมเด็จพระเจ้าอยู่หัว', type: 'official' },
+      { date: '2026-07-29', title: 'วันอาสาฬหบูชา', type: 'official' },
+      { date: '2026-07-30', title: 'วันเข้าพรรษา', type: 'official' },
+
+      // สิงหาคม
+      { date: '2026-08-12', title: 'วันแม่แห่งชาติ / วันเฉลิมพระชนมพรรษา สมเด็จพระบรมราชชนนีพันปีหลวง', type: 'official' },
+      { date: '2026-08-27', title: 'วันสารทจีน', type: 'cultural' },
+
+      // ตุลาคม
+      { date: '2026-10-11', title: 'วันสารทไทย / วันสารทเดือนสิบ', type: 'cultural' },
+      { date: '2026-10-13', title: 'วันคล้ายวันสวรรคต ร.9', type: 'official' },
+      { date: '2026-10-23', title: 'วันปิยมหาราช', type: 'official' },
+      { date: '2026-10-26', title: 'วันออกพรรษา', type: 'cultural' },
+
+      // พฤศจิกายน
+      { date: '2026-11-25', title: 'วันลอยกระทง', type: 'cultural' },
+
+      // ธันวาคม
+      { date: '2026-12-05', title: 'วันพ่อแห่งชาติ / วันคล้ายวันพระบรมราชสมภพ ร.9', type: 'official' },
+      { date: '2026-12-07', title: 'วันหยุดชดเชยวันพ่อแห่งชาติ', type: 'official' },
+      { date: '2026-12-10', title: 'วันรัฐธรรมนูญ', type: 'official' },
+      { date: '2026-12-31', title: 'วันสิ้นปี', type: 'official' }
+    ];
+
+    const thaiMonths = [
+      'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+    ];
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error || !user) {
+          window.location.href = 'index.html';
+          return;
+        }
+        currentUser = user;
+        document.getElementById('userEmailDisplay').innerText = user.email;
+        document.getElementById('userAvatar').innerText = user.email ? user.email.charAt(0).toUpperCase() : 'U';
+
+        await loadUserData();
+        renderCalendar();
+      } catch (err) {
+        console.error('Auth Error:', err);
+        window.location.href = 'index.html';
+      }
+    });
+
+    async function loadUserData() {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('points')
+        .eq('id', currentUser.id)
+        .single();
+
+      if (data && !error) {
+        document.getElementById('userPointsDisplay').innerText = parseFloat(data.points) || 0;
+      }
     }
 
-    window.addEvent = async () => {
-      const title = document.getElementById('eventTitle').value;
-      const date = document.getElementById('eventDate').value;
-
-      if (!title || !date) return alert('กรุณากรอกข้อมูลให้ครบถ้วน');
-
-      const { error } = await supabase.from('planner_events').insert([{
-        user_id: currentUser.id,
-        title: title,
-        event_date: date
-      }]);
-
-      if (!error) {
-        alert('บันทึกเรียบร้อย!');
-        loadEvents();
-      }
+    window.changeMonth = function(delta) {
+      currentDate.setMonth(currentDate.getMonth() + delta);
+      renderCalendar();
     };
 
-    async function loadEvents() {
-      const { data: events } = await supabase.from('planner_events').select('*').eq('user_id', currentUser.id).order('event_date', { ascending: true });
-      const listContainer = document.getElementById('eventList');
+    function renderCalendar() {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
 
-      if (!events || events.length === 0) {
-        listContainer.innerHTML = '<div class="text-slate-400">ยังไม่มีแผนการเรียนที่บันทึกไว้</div>';
-        return;
+      // Header Label
+      document.getElementById('currentMonthYear').innerText = `${thaiMonths[month]} ${year + 543}`;
+      document.getElementById('holidayMonthLabel').innerText = `ประจำเดือน${thaiMonths[month]} ${year + 543}`;
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+
+      // Empty slots for days before 1st
+      for (let i = 0; i < firstDay; i++) {
+        grid.innerHTML += `<div class="h-20 sm:h-24 bg-slate-50/50 rounded-2xl"></div>`;
       }
 
-      listContainer.innerHTML = events.map(e => `
-        <div class="flex justify-between items-center p-3 border rounded-xl bg-slate-50">
-          <span class="font-semibold text-slate-700">${e.title}</span>
-          <span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg">${e.event_date}</span>
-        </div>
-      `).join('');
+      // Filter holidays for current month
+      const currentMonthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
+      const monthHolidays = holidays2026.filter(h => h.date.startsWith(currentMonthStr));
+
+      // Days of the month
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${currentMonthStr}-${String(day).padStart(2, '0')}`;
+        const dayHolidays = holidays2026.filter(h => h.date === dateStr);
+
+        let badgeHtml = '';
+        let cellBg = 'bg-white border-slate-100 hover:border-indigo-300';
+
+        if (dayHolidays.length > 0) {
+          const hasOfficial = dayHolidays.some(h => h.type === 'official');
+          if (hasOfficial) {
+            cellBg = 'bg-rose-50/80 border-rose-200';
+            badgeHtml = `<div class="text-[10px] bg-rose-500 text-white font-bold p-1 rounded-lg truncate mt-1">${dayHolidays[0].title}</div>`;
+          } else {
+            cellBg = 'bg-amber-50/80 border-amber-200';
+            badgeHtml = `<div class="text-[10px] bg-amber-500 text-white font-bold p-1 rounded-lg truncate mt-1">${dayHolidays[0].title}</div>`;
+          }
+        }
+
+        grid.innerHTML += `
+          <div class="h-20 sm:h-24 p-2 rounded-2xl border ${cellBg} flex flex-col justify-between transition shadow-sm overflow-hidden">
+            <span class="font-bold text-sm ${dayHolidays.some(h=>h.type==='official') ? 'text-rose-600' : 'text-slate-700'}">${day}</span>
+            <div>${badgeHtml}</div>
+          </div>
+        `;
+      }
+
+      // Render Holidays Sidebar List
+      const holidaysListContainer = document.getElementById('holidaysList');
+      if (monthHolidays.length === 0) {
+        holidaysListContainer.innerHTML = `
+          <div class="text-center py-12 text-slate-400 text-sm">
+            🎈 เดือนนี้ไม่มีวันหยุดราชการ
+          </div>
+        `;
+      } else {
+        holidaysListContainer.innerHTML = monthHolidays.map(item => {
+          const dayNum = parseInt(item.date.split('-')[2]);
+          const isOfficial = item.type === 'official';
+          return `
+            <div class="p-3.5 rounded-2xl border ${isOfficial ? 'bg-rose-50 border-rose-100' : 'bg-amber-50 border-amber-100'} flex items-start gap-3">
+              <div class="w-10 h-10 rounded-xl ${isOfficial ? 'bg-rose-500' : 'bg-amber-500'} text-white font-black flex items-center justify-center shrink-0 text-sm">
+                ${dayNum}
+              </div>
+              <div>
+                <div class="text-xs font-bold ${isOfficial ? 'text-rose-600' : 'text-amber-700'} mb-0.5">
+                  ${isOfficial ? '🚩 วันหยุดราชการ' : '✨ วันสำคัญทางประเพณี'}
+                </div>
+                <div class="text-sm font-bold text-slate-800 leading-snug">${item.title}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
     }
 
-    init();
+    window.handleLogout = async function() {
+      await supabase.auth.signOut();
+      window.location.href = 'index.html';
+    };
   </script>
 </body>
 </html>
