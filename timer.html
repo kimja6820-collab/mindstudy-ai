@@ -271,10 +271,11 @@
         document.getElementById('completedRoundsCount').innerText = completedRounds;
 
         let pointsEarned = 0;
+        const minsRead = Math.floor(studyDuration / 60);
+
         if (currentTechnique === 'custom') {
-          // กำหนดเอง: ทุกๆ 10 นาที ได้ 5 Points
-          const minsRead = Math.floor(studyDuration / 60);
-          pointsEarned = Math.floor(minsRead / 10) * 5;
+          // คิดขั้นต่ำ 1 Point สำหรับทดสอบเวลาสั้นๆ (ถ้า 10 นาทีขึ้นไปคิดนาทีละ 0.5 Point)
+          pointsEarned = Math.max(1, Math.floor(minsRead * 0.5));
         } else {
           // ครบเทคนิคได้ 50 Points
           pointsEarned = 50;
@@ -284,8 +285,18 @@
         if (pointsEarned > 0) {
           userPoints += pointsEarned;
           document.getElementById('userPointsDisplay').innerText = userPoints;
-          await supabase.from('profiles').upsert({ id: currentUser.id, points: userPoints });
-          alert(`🎉 ยินดีด้วย! คุณอ่านหนังสือครบช่วงเวลาแล้ว ได้รับ +${pointsEarned} Points!`);
+          
+          const { error } = await supabase.from('profiles').upsert({ 
+            id: currentUser.id, 
+            points: userPoints,
+            updated_at: new Date().toISOString()
+          });
+
+          if (error) {
+            console.error('Error saving points:', error.message);
+          } else {
+            alert(`🎉 ยินดีด้วย! คุณอ่านหนังสือครบช่วงเวลาแล้ว ได้รับ +${pointsEarned} Points!`);
+          }
         } else {
           alert('🎉 ยินดีด้วย! คุณอ่านหนังสือครบช่วงเวลาแล้ว');
         }
