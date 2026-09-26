@@ -3,409 +3,257 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MindStudy AI - เควสพัฒนาห้องอ่านหนังสือ</title>
+  <title>MindStudy AI - หน้าหลัก</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Sarabun', sans-serif; }
-    .font-pixel { font-family: 'Press Start 2P', cursive; }
-    
-    .pixel-room {
-      background: linear-gradient(to bottom, #1e1b4b 0%, #312e81 60%, #4338ca 100%);
-      box-shadow: inset 0 0 40px rgba(0,0,0,0.7);
-    }
-
-    .pixel-desk {
-      background: #78350f;
-      border-top: 4px solid #b45309;
-      box-shadow: 0 10px 0 #451a03;
-    }
-
-    @keyframes pixelBob {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-4px); }
-    }
-    .animate-pixel { animation: pixelBob 2s infinite ease-in-out; }
-  </style>
 </head>
-<body class="bg-slate-100 font-sans min-h-screen flex flex-col">
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col">
 
-  <!-- Navbar -->
+  <!-- 1. Navigation Bar -->
   <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16 items-center">
+        <!-- Logo & Navigation Links -->
         <div class="flex items-center space-x-8">
-          <span class="text-2xl font-extrabold text-indigo-600 flex items-center gap-2">🧠 MindStudy AI</span>
+          <span class="text-2xl font-extrabold text-indigo-600 flex items-center gap-2">
+            🧠 MindStudy AI
+          </span>
           <div class="hidden md:flex space-x-4">
-            <a href="dashboard.html" class="text-slate-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-lg transition">หน้าหลัก</a>
+            <a href="dashboard.html" class="text-indigo-600 font-bold px-3 py-2 rounded-lg bg-indigo-50">หน้าหลัก</a>
             <a href="timer.html" class="text-slate-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-lg transition">จับเวลาเรียน</a>
-            <a href="quest.html" class="text-indigo-600 font-bold px-3 py-2 rounded-lg bg-indigo-50">🏆 เควสห้องอ่านหนังสือ</a>
+            <a href="calendar.html" class="text-slate-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-lg transition">ปฏิทินวางแผน</a>
+            <a href="minigame.html" class="text-slate-600 hover:text-indigo-600 font-medium px-3 py-2 rounded-lg transition">มินิเกมห้องพิกเซล</a>
           </div>
         </div>
-        
-        <!-- แสดงข้อมูลผู้ใช้แบบคงที่ (แยกออกจากระบบโปรไฟล์หลัก) -->
-        <div class="flex items-center space-x-3 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
-          <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm" id="userAvatar">U</div>
-          <span class="text-sm font-semibold text-slate-700 pr-2 hidden sm:inline" id="userEmailDisplay">Loading...</span>
+
+        <!-- Right Menu: User Profile & Points -->
+        <div class="relative group">
+          <button class="flex items-center space-x-3 bg-slate-100 hover:bg-indigo-50 p-2 rounded-full border border-slate-200 transition">
+            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm" id="userAvatar">
+              U
+            </div>
+            <span class="text-sm font-semibold text-slate-700 pr-2 hidden sm:inline" id="userEmailDisplay">Loading...</span>
+          </button>
+
+          <!-- Hover Dropdown Modal -->
+          <div class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 hidden group-hover:block transition-all duration-200 z-50">
+            <div class="text-xs text-slate-400 font-medium">คะแนนสะสมของคุณ</div>
+            <div class="text-2xl font-black text-amber-500 my-1 flex items-center gap-1">
+              ⭐ <span id="userPointsDisplay">0</span> <span class="text-xs font-normal text-slate-500">Points</span>
+            </div>
+            <hr class="my-3 border-slate-100">
+            <button onclick="window.handleLogout()" class="w-full text-left text-sm font-semibold text-rose-500 hover:bg-rose-50 p-2 rounded-xl transition">
+              🚪 ออกจากระบบ
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- Main Section -->
+  <!-- Main Content -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 space-y-8">
-    
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <div>
-        <h1 class="text-3xl font-black text-slate-800">🏆 เควสพัฒนาห้องอ่านหนังสือ (Study Room Quest)</h1>
-        <p class="text-sm text-slate-500 mt-1">พิชิตเควสประจำวัน สะสม EXP & Points เพื่ออัปเกรดอุปกรณ์ในห้องของคุณให้เป็นระดับ Max!</p>
-      </div>
-      <div class="bg-amber-400/10 border-2 border-amber-400/40 px-6 py-3 rounded-2xl flex items-center gap-3 shadow-sm">
-        <span class="text-3xl animate-pixel">⭐</span>
+
+    <!-- Section 1: Points Summary Stat -->
+    <section class="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-3xl p-6 text-white shadow-lg">
+      <h2 class="text-xl font-bold mb-4">⭐ คะแนนสะสมของคุณ</h2>
+      <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 flex items-center justify-between">
         <div>
-          <div class="text-[10px] font-black text-amber-600 tracking-wider">POINTS สะสม</div>
-          <div class="text-2xl font-black text-amber-600" id="headerPointsDisplay">0</div>
+          <div class="text-sm text-indigo-100 font-medium">Point ที่ได้รับสะสมทั้งหมด</div>
+          <div class="text-4xl font-extrabold text-amber-300 mt-1" id="earnedPoints">0 PT</div>
         </div>
+        <div class="text-5xl">🏆</div>
       </div>
-    </div>
+    </section>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Section 2: Stress Assessment & Diary -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       
-      <!-- Room Preview (7 Cols) -->
-      <div class="lg:col-span-7 bg-slate-900 rounded-3xl p-6 shadow-2xl flex flex-col border-4 border-slate-800 relative overflow-hidden min-h-[460px]">
-        
-        <div class="flex justify-between items-center z-10 mb-4">
-          <span class="text-[10px] font-pixel text-amber-300 bg-black/60 px-3 py-2 rounded-xl border border-amber-400/30">
-            🏠 STUDY ROOM LVL PROGRESS
-          </span>
-          <span class="text-xs font-bold text-amber-400 bg-amber-950/80 px-3 py-1.5 rounded-xl border border-amber-800" id="totalLevelDisplay">
-            รวมระดับห้อง: Lv.0
+      <!-- Write Entry Form (2 Cols) -->
+      <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800">📝 แบบประเมินความเครียด & ไดอารี่วันนี้</h2>
+            <p class="text-xs text-slate-400 mt-1">บันทึกความรู้สึกได้สูงสุด 3 ครั้ง/วัน</p>
+          </div>
+          <span class="text-xs font-bold px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full" id="dailyLimitBadge">
+            โควต้าวันนี้: 0/3
           </span>
         </div>
 
-        <!-- Room Canvas -->
-        <div class="pixel-room flex-1 rounded-2xl relative border-4 border-slate-950 overflow-hidden flex flex-col justify-between p-6">
-          
-          <!-- Top Layer -->
-          <div class="flex justify-between items-start z-10">
-            <div class="w-24 h-28 bg-slate-900 border-4 border-slate-700 rounded-lg relative overflow-hidden flex items-center justify-center">
-              <div class="text-2xl animate-pulse">🌙</div>
-              <div class="absolute inset-0 grid grid-cols-2 grid-rows-2 border-2 border-slate-700/50"></div>
-            </div>
-
-            <div class="flex gap-4 items-start">
-              <div id="slot-bookshelf" class="text-right hidden">
-                <span id="icon-bookshelf" class="text-4xl filter drop-shadow-lg">📚</span>
-                <div class="text-[9px] font-bold text-amber-300 bg-black/70 px-1.5 py-0.5 rounded mt-1" id="lvl-bookshelf">Lv.1</div>
-              </div>
-            </div>
+        <!-- Mood Selector -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-2">1. ระดับความเครียด/ความรู้สึกขณะนี้</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="stressOptions">
+            <button type="button" onclick="window.selectStress('สบายๆ', '😊', event)" class="stress-btn p-3 border-2 border-slate-100 rounded-2xl text-left hover:border-emerald-400 transition" data-level="สบายๆ">
+              <span class="text-2xl">😊</span>
+              <div class="font-bold text-slate-700 text-sm mt-1">สบายๆ</div>
+              <div class="text-[10px] text-slate-400">พร้อมลุยอ่าน</div>
+            </button>
+            <button type="button" onclick="window.selectStress('กังวลนิดหน่อย', '😐', event)" class="stress-btn p-3 border-2 border-slate-100 rounded-2xl text-left hover:border-amber-400 transition" data-level="กังวลนิดหน่อย">
+              <span class="text-2xl">😐</span>
+              <div class="font-bold text-slate-700 text-sm mt-1">กังวลนิดหน่อย</div>
+              <div class="text-[10px] text-slate-400">พอรับมือไหว</div>
+            </button>
+            <button type="button" onclick="window.selectStress('เครียดมาก', '😰', event)" class="stress-btn p-3 border-2 border-slate-100 rounded-2xl text-left hover:border-orange-400 transition" data-level="เครียดมาก">
+              <span class="text-2xl">😰</span>
+              <div class="font-bold text-slate-700 text-sm mt-1">เครียดมาก</div>
+              <div class="text-[10px] text-slate-400">เริ่มอึดอัด</div>
+            </button>
+            <button type="button" onclick="window.selectStress('เครียดที่สุด', '😫', event)" class="stress-btn p-3 border-2 border-slate-100 rounded-2xl text-left hover:border-rose-400 transition" data-level="เครียดที่สุด">
+              <span class="text-2xl">😫</span>
+              <div class="font-bold text-slate-700 text-sm mt-1">เครียดที่สุด</div>
+              <div class="text-[10px] text-slate-400">จะไม่ไหวแล้ว</div>
+            </button>
           </div>
-
-          <!-- Desk Layer -->
-          <div class="relative z-10 mt-auto">
-            
-            <div class="flex justify-around items-end mb-1 px-4">
-              <div id="slot-plant" class="text-center hidden">
-                <span id="icon-plant" class="text-3xl animate-pixel">🪴</span>
-                <div class="text-[9px] font-bold text-emerald-300 bg-black/70 px-1.5 py-0.5 rounded mt-1" id="lvl-plant">Lv.1</div>
-              </div>
-              <div id="slot-lamp" class="text-center hidden">
-                <span id="icon-lamp" class="text-3xl">💡</span>
-                <div class="text-[9px] font-bold text-amber-300 bg-black/70 px-1.5 py-0.5 rounded mt-1" id="lvl-lamp">Lv.1</div>
-              </div>
-              <div id="slot-coffee" class="text-center hidden">
-                <span id="icon-coffee" class="text-2xl">☕</span>
-                <div class="text-[9px] font-bold text-rose-300 bg-black/70 px-1.5 py-0.5 rounded mt-1" id="lvl-coffee">Lv.1</div>
-              </div>
-            </div>
-
-            <!-- Desk -->
-            <div class="pixel-desk h-20 rounded-xl flex items-center justify-between px-8 relative shadow-2xl">
-              <div class="text-4xl -mt-10 animate-pixel" title="คุณกำลังนั่งเรียนอย่างตั้งใจ">🧑‍💻</div>
-
-              <div id="slot-cat" class="text-center hidden -mt-8">
-                <span id="icon-cat" class="text-3xl">🐱</span>
-                <div class="text-[9px] font-bold text-orange-300 bg-black/70 px-1.5 py-0.5 rounded mt-1" id="lvl-cat">Lv.1</div>
-              </div>
-            </div>
-
-            <div class="h-6 bg-slate-950 rounded-b-xl flex items-center justify-center">
-              <div class="text-[9px] font-pixel text-slate-600">STUDY ROOM FLOOR</div>
-            </div>
-          </div>
-
         </div>
 
-        <div class="mt-4 text-center">
-          <p class="text-xs text-slate-400">💡 เควสประจำวันช่วยให้คุณได้ Points นำมาอัปเกรดอุปกรณ์ในห้องเรียน!</p>
+        <!-- Diary Textarea -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-2">2. เล่าความรู้สึกหรือสิ่งที่เจอในวันนี้ (ไดอารี่)</label>
+          <textarea id="diaryInput" rows="4" placeholder="วันนี้รู้สึกอย่างไรบ้าง มีเรื่องอะไรกังวลใจไหม..." class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-400 text-sm"></textarea>
+        </div>
+
+        <button id="saveDiaryBtn" onclick="window.handleSaveDiary()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-2xl transition shadow-md">
+          บันทึกไดอารี่
+        </button>
+      </div>
+
+      <!-- History Sidebar (1 Col) -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col">
+        <h2 class="text-xl font-bold text-slate-800 mb-4">📜 ประวัติบันทึกย้อนหลัง</h2>
+        <div id="historyList" class="space-y-4 overflow-y-auto max-h-[420px] pr-1 flex-1">
+          <p class="text-slate-400 text-sm text-center py-8">ยังไม่มีประวัติบันทึก</p>
         </div>
       </div>
 
-      <!-- Quests & Upgrades Sidebar (5 Cols) -->
-      <div class="lg:col-span-5 space-y-6">
-        
-        <!-- Daily Quests -->
-        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
-          <div class="flex items-center justify-between">
-            <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
-              📜 เควสฝึกตนประจำวัน
-            </h2>
-            <span class="text-xs text-indigo-600 bg-indigo-50 font-bold px-2.5 py-1 rounded-lg">รีเซ็ตทุกวัน</span>
-          </div>
-          <div class="space-y-3" id="questList">
-            <!-- Quests Rendered -->
-          </div>
-        </div>
-
-        <!-- Upgrade Center -->
-        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
-          <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
-            🛠️ ศูนย์อัปเกรดอุปกรณ์ห้อง
-          </h2>
-          <div class="space-y-3 max-h-[340px] overflow-y-auto pr-1" id="upgradeList">
-            <!-- Upgrades Rendered -->
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
+    </section>
   </main>
 
   <script type="module">
     import { supabase } from './js/supabase-config.js';
 
+    let selectedStress = '';
+    let selectedEmoji = '';
     let currentUser = null;
-    let userPoints = 0;
-    let itemLevels = {};
 
-    const itemData = [
-      {
-        id: 'lamp',
-        name: 'โคมไฟอ่านหนังสือ',
-        levels: [
-          { lvl: 1, name: 'โคมไฟตั้งโต๊ะเก่าๆ', price: 15, icon: '💡' },
-          { lvl: 2, name: 'โคมไฟ LED ถนอมสายตา', price: 40, icon: '🔦' },
-          { lvl: 3, name: 'โคมไฟ Ambient RGB ขั้นเทพ', price: 100, icon: '🏮' }
-        ]
-      },
-      {
-        id: 'plant',
-        name: 'ต้นไม้สร้างสมาธิ',
-        levels: [
-          { lvl: 1, name: 'กระบองเพชรจิ๋ว', price: 25, icon: '🌵' },
-          { lvl: 2, name: 'ต้นมอนสเตอร่าด่าง', price: 60, icon: '🪴' },
-          { lvl: 3, name: 'กระถางสวนแนวตั้งอัจฉริยะ', price: 150, icon: '🌳' }
-        ]
-      },
-      {
-        id: 'coffee',
-        name: 'เครื่องดื่มเติมพลัง',
-        levels: [
-          { lvl: 1, name: 'กาแฟซองสำเร็จรูป', price: 30, icon: '☕' },
-          { lvl: 2, name: 'กาแฟดริปสกัดเย็น', price: 75, icon: '🧋' },
-          { lvl: 3, name: 'เครื่องชงเอสเปรสโซฮับ', price: 180, icon: '🍹' }
-        ]
-      },
-      {
-        id: 'cat',
-        name: 'สัตว์เลี้ยงคู่ใจ',
-        levels: [
-          { lvl: 1, name: 'แมวส้มขี้เกียจ', price: 50, icon: '🐱' },
-          { lvl: 2, name: 'แมวพร้อมเบาะนุ่ม', price: 120, icon: '😸' },
-          { lvl: 3, name: 'คอนโดแมวหรูหรา 3 ชั้น', price: 250, icon: '🦁' }
-        ]
-      },
-      {
-        id: 'bookshelf',
-        name: 'หิ้งตำราเรียน',
-        levels: [
-          { lvl: 1, name: 'หิ้งไม้ติดผนังเรียบๆ', price: 80, icon: '🪵' },
-          { lvl: 2, name: 'ชั้นหนังสือสไตล์มินิมอล', price: 200, icon: '📚' },
-          { lvl: 3, name: 'ตู้หนังสือไม้สักสไตล์คลาสสิก', price: 400, icon: '🏛️' }
-        ]
-      }
-    ];
-
-    const dailyQuests = [
-      { id: 'quest_focus', name: 'โฟกัสอ่านหนังสือ 25 นาที', reward: 15, icon: '⏱️' },
-      { id: 'quest_plan', name: 'จัดตารางเรียนประจำสัปดาห์', reward: 10, icon: '📅' },
-      { id: 'quest_clean', name: 'จัดระเบียบโต๊ะอ่านหนังสือ', reward: 8, icon: '🧹' }
-    ];
-
+    // ตรวจสอบ Session เมื่อเปิดหน้าเว็บ
     window.addEventListener('DOMContentLoaded', async () => {
-      try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error || !user) {
-          window.location.href = 'index.html';
-          return;
-        }
-        currentUser = user;
-        
-        // แสดงตัวอักษรตัวแรกของ Email ใน Avatar และแสดง Email
-        if (user.email) {
-          document.getElementById('userAvatar').innerText = user.email.charAt(0).toUpperCase();
-          document.getElementById('userEmailDisplay').innerText = user.email;
-        }
-
-        await loadProfileData();
-        renderQuests();
-        renderUpgrades();
-        renderRoom();
-      } catch (err) {
-        console.error(err);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
       }
+      currentUser = user;
+      document.getElementById('userEmailDisplay').innerText = user.email;
+      document.getElementById('userAvatar').innerText = user.email ? user.email.charAt(0).toUpperCase() : 'U';
+
+      await loadUserData();
+      await loadTodayDiaries();
     });
 
-    async function loadProfileData() {
-      const { data } = await supabase
+    // ดึงข้อมูล Points จากตาราง profiles
+    async function loadUserData() {
+      const { data, error } = await supabase
         .from('profiles')
-        .select('points, unlocked_items')
+        .select('points')
         .eq('id', currentUser.id)
         .single();
 
-      if (data) {
-        userPoints = Number(data.points) || 0;
-        
-        if (typeof data.unlocked_items === 'object' && data.unlocked_items !== null && !Array.isArray(data.unlocked_items)) {
-          itemLevels = data.unlocked_items;
-        } else {
-          itemLevels = {};
-        }
+      if (data && !error) {
+        const points = parseFloat(data.points) || 0;
+        document.getElementById('userPointsDisplay').innerText = points;
+        document.getElementById('earnedPoints').innerText = `${points} PT`;
       }
-      updateUI();
     }
 
-    function updateUI() {
-      document.getElementById('headerPointsDisplay').innerText = userPoints;
-
-      let totalLvl = 0;
-      Object.values(itemLevels).forEach(lvl => totalLvl += Number(lvl));
-      document.getElementById('totalLevelDisplay').innerText = `รวมระดับห้อง: Lv.${totalLvl}`;
-    }
-
-    function renderRoom() {
-      itemData.forEach(item => {
-        const currentLvl = itemLevels[item.id] || 0;
-        const slot = document.getElementById(`slot-${item.id}`);
-        const icon = document.getElementById(`icon-${item.id}`);
-        const lvlBadge = document.getElementById(`lvl-${item.id}`);
-
-        if (currentLvl > 0) {
-          slot.classList.remove('hidden');
-          const lvlInfo = item.levels[currentLvl - 1];
-          icon.innerText = lvlInfo.icon;
-          lvlBadge.innerText = `Lv.${currentLvl}`;
-        } else {
-          slot.classList.add('hidden');
-        }
+    // เลือกความเครียด
+    window.selectStress = function(level, emoji, event) {
+      selectedStress = level;
+      selectedEmoji = emoji;
+      document.querySelectorAll('.stress-btn').forEach(btn => {
+        btn.classList.remove('border-indigo-600', 'bg-indigo-50');
       });
-    }
-
-    function renderQuests() {
-      const container = document.getElementById('questList');
-      container.innerHTML = '';
-      const todayStr = new Date().toISOString().split('T')[0];
-
-      dailyQuests.forEach(quest => {
-        const isDone = (localStorage.getItem(`${quest.id}_${currentUser.id}`) === todayStr);
-
-        container.innerHTML += `
-          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="text-2xl">${quest.icon}</span>
-              <div>
-                <div class="text-xs font-bold text-slate-800">${quest.name}</div>
-                <div class="text-[11px] font-extrabold text-amber-600">⭐ +${quest.reward} Points</div>
-              </div>
-            </div>
-            ${isDone ? `
-              <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-3 py-1.5 rounded-xl">สำเร็จแล้ว</span>
-            ` : `
-              <button onclick="window.claimQuest('${quest.id}',${quest.reward})" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition">
-                ส่งเควส
-              </button>
-            `}
-          </div>
-        `;
-      });
-    }
-
-    function renderUpgrades() {
-      const container = document.getElementById('upgradeList');
-      container.innerHTML = '';
-
-      itemData.forEach(item => {
-        const currentLvl = itemLevels[item.id] || 0;
-        const isMax = currentLvl >= 3;
-        const nextLvlInfo = isMax ? null : item.levels[currentLvl];
-
-        container.innerHTML += `
-          <div class="p-3.5 border rounded-2xl flex items-center justify-between gap-3 ${isMax ? 'bg-amber-50/50 border-amber-200' : 'bg-white border-slate-200'}">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-xl font-bold">
-                ${currentLvl > 0 ? item.levels[currentLvl - 1].icon : '🔒'}
-              </div>
-              <div>
-                <div class="text-xs font-bold text-slate-800">${item.name} <span class="text-indigo-600">(Lv.${currentLvl}/3)</span></div>
-                <div class="text-[11px] text-slate-500">
-                  ${isMax ? '✨ ปลดล็อกขั้นสูงสุดแล้ว!' : `ถัดไป: ${nextLvlInfo.name}`}
-                </div>
-              </div>
-            </div>
-            <div>
-              ${isMax ? `
-                <span class="text-xs font-black text-amber-600 bg-amber-100 px-3 py-1.5 rounded-xl">MAX</span>
-              ` : `
-                <button onclick="window.upgradeItem('${item.id}',${nextLvlInfo.price})" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                  ${currentLvl === 0 ? 'ปลดล็อก' : 'อัปเกรด'} ⭐ ${nextLvlInfo.price}
-                </button>
-              `}
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    window.claimQuest = async function(questId, reward) {
-      const todayStr = new Date().toISOString().split('T')[0];
-      const newPoints = userPoints + reward;
-
-      const { error } = await supabase.from('profiles').update({ points: newPoints }).eq('id', currentUser.id);
-
-      if (!error) {
-        userPoints = newPoints;
-        localStorage.setItem(`${questId}_${currentUser.id}`, todayStr);
-        alert(`🎉 สำเร็จเควส! ได้รับ +${reward} Points`);
-        updateUI();
-        renderQuests();
+      if (event && event.currentTarget) {
+        event.currentTarget.classList.add('border-indigo-600', 'bg-indigo-50');
       }
     };
 
-    window.upgradeItem = async function(itemId, price) {
-      if (userPoints < price) {
-        alert('❌ Points ของคุณไม่พอสำหรับการอัปเกรด!');
-        return;
+    // บันทึก ไดอารี่ + แบบประเมิน
+    window.handleSaveDiary = async function() {
+      const diaryText = document.getElementById('diaryInput').value.trim();
+      if (!selectedStress) return alert('กรุณาเลือกระดับความเครียด');
+      if (!diaryText) return alert('กรุณากรอกข้อความไดอารี่');
+
+      // ตรวจสอบโควต้า 3 ครั้ง/วัน
+      const today = new Date();
+      const startOfTodayISO = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+
+      const { data: todayEntries } = await supabase
+        .from('diaries')
+        .select('id')
+        .eq('user_id', currentUser.id)
+        .gte('created_at', startOfTodayISO);
+
+      if (todayEntries && todayEntries.length >= 3) {
+        return alert('คุณบันทึกไดอารี่ครบ 3 ครั้งสำหรับวันนี้แล้วครับ');
       }
 
-      const currentLvl = itemLevels[itemId] || 0;
-      const newLevels = { ...itemLevels, [itemId]: currentLvl + 1 };
-      const newPoints = userPoints - price;
+      // บันทึกลง Supabase
+      const { error } = await supabase.from('diaries').insert([{
+        user_id: currentUser.id,
+        stress_level: selectedStress,
+        emoji: selectedEmoji,
+        content: diaryText
+      }]);
 
-      const { error } = await supabase
-        .from('profiles')
-        .update({ points: newPoints, unlocked_items: newLevels })
-        .eq('id', currentUser.id);
-
-      if (!error) {
-        userPoints = newPoints;
-        itemLevels = newLevels;
-        alert(`🎉 อัปเกรดสำเร็จ! ${itemData.find(i=>i.id===itemId).name} เลเวลเพิ่มขึ้นแล้ว`);
-        updateUI();
-        renderUpgrades();
-        renderRoom();
+      if (error) {
+        alert('เกิดข้อผิดพลาด: ' + error.message);
+      } else {
+        alert('บันทึกไดอารี่สำเร็จ!');
+        document.getElementById('diaryInput').value = '';
+        await loadTodayDiaries();
       }
+    };
+
+    // โหลดประวัติย้อนหลัง
+    async function loadTodayDiaries() {
+      const { data, error } = await supabase
+        .from('diaries')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      const historyContainer = document.getElementById('historyList');
+      const today = new Date();
+      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+      if (data) {
+        const todayCount = data.filter(item => item.created_at && new Date(item.created_at) >= startOfToday).length;
+        document.getElementById('dailyLimitBadge').innerText = `โควต้าวันนี้: ${todayCount}/3`;
+
+        if (data.length === 0) {
+          historyContainer.innerHTML = `<p class="text-slate-400 text-sm text-center py-8">ยังไม่มีประวัติบันทึก</p>`;
+          return;
+        }
+
+        historyContainer.innerHTML = data.map(item => `
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-indigo-600 flex items-center gap-1">
+                ${item.emoji || '📝'} ${item.stress_level}
+              </span>
+              <span class="text-slate-400">${new Date(item.created_at).toLocaleString('th-TH')}</span>
+            </div>
+            <p class="text-sm text-slate-700 font-medium">${item.content}</p>
+          </div>
+        `).join('');
+      }
+    }
+
+    // ออกจากระบบ
+    window.handleLogout = async function() {
+      await supabase.auth.signOut();
+      window.location.href = 'index.html';
     };
   </script>
 </body>
