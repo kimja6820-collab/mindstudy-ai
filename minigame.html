@@ -10,9 +10,12 @@
     body { font-family: 'Sarabun', sans-serif; }
     .font-pixel { font-family: 'Press Start 2P', cursive; }
     
+    /* Pixel Room Container Styling */
     .pixel-room {
       background: linear-gradient(to bottom, #2b1055 0%, #7597de 60%, #e0c3fc 100%);
       box-shadow: inset 0 0 40px rgba(0,0,0,0.6);
+      background-size: cover;
+      background-position: center;
     }
     
     .pixel-window {
@@ -27,6 +30,7 @@
       box-shadow: 0 10px 0 #3f2305;
     }
 
+    /* Pixel Floating Animations */
     @keyframes pixelBob {
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-4px); }
@@ -96,9 +100,10 @@
           </span>
         </div>
 
+        <!-- Room Canvas (ถ้ามีรูปฉากหลัง ให้ใส่ style="background-image: url('images/room-bg.png');") -->
         <div class="pixel-room flex-1 rounded-2xl relative border-4 border-slate-950 overflow-hidden flex flex-col justify-between p-6">
           
-          <!-- Top Layer -->
+          <!-- Top Layer (ผนังห้อง) -->
           <div class="flex justify-between items-start z-10">
             <div class="pixel-window w-24 h-28 rounded-lg relative overflow-hidden flex items-center justify-center">
               <div class="text-xl animate-pulse">🌙</div>
@@ -106,22 +111,43 @@
             </div>
 
             <div class="flex gap-3 items-start">
-              <div id="slot-trophy" class="hidden text-3xl animate-pixel" title="ถ้วยรางวัล">🏆</div>
-              <div id="slot-bookshelf" class="hidden bg-amber-900/90 border-2 border-amber-700 p-2 rounded-lg text-2xl shadow-lg" title="ชั้นวางหนังสือ">📚</div>
+              <div id="slot-trophy" class="hidden" title="ถ้วยรางวัล">
+                <img src="images/trophy.png" alt="ถ้วยรางวัล" class="w-12 h-auto animate-pixel filter drop-shadow-md" onerror="this.src='https://via.placeholder.com/50?text=🏆'">
+              </div>
+              <div id="slot-bookshelf" class="hidden" title="ชั้นวางหนังสือ">
+                <img src="images/bookshelf.png" alt="ชั้นหนังสือ" class="w-20 h-auto filter drop-shadow-md" onerror="this.src='https://via.placeholder.com/80?text=📚'">
+              </div>
             </div>
           </div>
 
-          <!-- Desk Layer -->
+          <!-- Bottom Layer (โต๊ะเรียนและของตกแต่ง) -->
           <div class="relative z-10 mt-auto">
+            
+            <!-- ของวางบนโต๊ะ -->
             <div class="flex justify-around items-end mb-1 px-4">
-              <div id="slot-plant" class="hidden text-3xl animate-pixel" title="ต้นไม้">🪴</div>
-              <div id="slot-lamp" class="hidden text-3xl" title="โคมไฟ">💡</div>
-              <div id="slot-coffee" class="hidden text-2xl" title="กาแฟ">☕</div>
+              <div id="slot-plant" class="hidden" title="ต้นไม้">
+                <img src="images/plant.png" alt="ต้นไม้" class="w-12 h-auto animate-pixel" onerror="this.src='https://via.placeholder.com/50?text=🪴'">
+              </div>
+              <div id="slot-lamp" class="hidden" title="โคมไฟ">
+                <img src="images/lamp.png" alt="โคมไฟ" class="w-10 h-auto" onerror="this.src='https://via.placeholder.com/40?text=💡'">
+              </div>
+              <div id="slot-coffee" class="hidden" title="กาแฟ">
+                <img src="images/coffee.png" alt="กาแฟ" class="w-8 h-auto" onerror="this.src='https://via.placeholder.com/30?text=☕'">
+              </div>
             </div>
 
+            <!-- โต๊ะเรียน + ตัวละครคุณ -->
             <div class="pixel-desk h-20 rounded-xl flex items-center justify-between px-8 relative shadow-2xl">
-              <div class="text-5xl -mt-10 animate-pixel">🧑‍💻</div>
-              <div id="slot-cat" class="hidden text-4xl -mt-8" title="แมวส้ม">🐱</div>
+              
+              <!-- 🎨 รูปตัวละครที่คุณวาดเอง -->
+              <div class="-mt-12 animate-pixel" title="ตัวละครของคุณ">
+                <img src="images/player.png" alt="Player Character" class="w-20 h-auto filter drop-shadow-lg" onerror="this.src='https://via.placeholder.com/80?text=🧑‍💻'">
+              </div>
+
+              <!-- สัตว์เลี้ยง -->
+              <div id="slot-cat" class="hidden -mt-8" title="แมวส้ม">
+                <img src="images/cat.png" alt="แมวส้ม" class="w-14 h-auto filter drop-shadow-md" onerror="this.src='https://via.placeholder.com/60?text=🐱'">
+              </div>
             </div>
 
             <div class="h-8 bg-amber-950 border-t-2 border-amber-800/60 rounded-b-xl flex items-center justify-center">
@@ -132,7 +158,7 @@
         </div>
 
         <div class="mt-4 text-center">
-          <p class="text-xs text-slate-400">✨ กดทำภารกิจประจำวันด้านขวาเพื่อสุ่มรับ Points แล้วซื้อของมาแต่งห้องกัน!</p>
+          <p class="text-xs text-slate-400">✨ ทำภารกิจสุ่มรับ Points มาปลดล็อกไอเทมตกแต่งห้องรูปวาดของคุณเอง!</p>
         </div>
       </div>
 
@@ -155,7 +181,7 @@
         <!-- Shop Items Card -->
         <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
           <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
-            🛍️ ร้านค้าไอเทมพิกเซล
+            🛍️ ร้านค้าไอเทมรูปวาด
           </h2>
           <div class="space-y-3 max-h-[320px] overflow-y-auto pr-1" id="shopList">
             <!-- Shop Items JS Rendered -->
@@ -175,13 +201,14 @@
     let userPoints = 0;
     let userUnlockedItems = [];
 
+    // ระบุ path รูปภาพไอเทมที่คุณวาดไว้ตรงนี้
     const shopItems = [
-      { id: 'lamp', name: 'โคมไฟอ่านหนังสือ', price: 15, icon: '💡', desc: 'เพิ่มแสงสว่างบนโต๊ะ' },
-      { id: 'plant', name: 'ต้นไม้มงคลพิกเซล', price: 25, icon: '🪴', desc: 'ประดับข้างโต๊ะเรียน' },
-      { id: 'coffee', name: 'กาแฟร้อนแก้วโปรด', price: 30, icon: '☕', desc: 'วางเพิ่มพลังยามดึก' },
-      { id: 'cat', name: 'แมวส้มจอมขี้เกียจ', price: 50, icon: '🐱', desc: 'นั่งเฝ้าโต๊ะเป็นเพื่อน' },
-      { id: 'bookshelf', name: 'ชั้นวางตำราเรียน', price: 80, icon: '📚', desc: 'แขวนผนังห้องอ่านหนังสือ' },
-      { id: 'trophy', name: 'ถ้วยรางวัลเรียนดี', price: 120, icon: '🏆', desc: 'ประดับผนังเพิ่มความภูมิใจ' }
+      { id: 'lamp', name: 'โคมไฟอ่านหนังสือ', price: 15, image: 'images/lamp.png', desc: 'เพิ่มแสงสว่างบนโต๊ะ' },
+      { id: 'plant', name: 'ต้นไม้มงคลพิกเซล', price: 25, image: 'images/plant.png', desc: 'ประดับข้างโต๊ะเรียน' },
+      { id: 'coffee', name: 'กาแฟร้อนแก้วโปรด', price: 30, image: 'images/coffee.png', desc: 'วางเพิ่มพลังยามดึก' },
+      { id: 'cat', name: 'แมวส้มจอมขี้เกียจ', price: 50, image: 'images/cat.png', desc: 'นั่งเฝ้าโต๊ะเป็นเพื่อน' },
+      { id: 'bookshelf', name: 'ชั้นวางตำราเรียน', price: 80, image: 'images/bookshelf.png', desc: 'แขวนผนังห้องอ่านหนังสือ' },
+      { id: 'trophy', name: 'ถ้วยรางวัลเรียนดี', price: 120, image: 'images/trophy.png', desc: 'ประดับผนังเพิ่มความภูมิใจ' }
     ];
 
     const dailyTasks = [
@@ -259,7 +286,6 @@
       });
     }
 
-    // หาวันที่ปัจจุบัน รูปแบบ YYYY-MM-DD
     function getTodayString() {
       const today = new Date();
       return today.toISOString().split('T')[0];
@@ -271,7 +297,6 @@
       const todayStr = getTodayString();
 
       dailyTasks.forEach(task => {
-        // เช็กว่าวันนี้ทำภารกิจนี้ไปแล้วหรือยัง
         const lastDoneDate = localStorage.getItem(`task_${task.id}_${currentUser.id}`);
         const isDoneToday = (lastDoneDate === todayStr);
 
@@ -308,7 +333,8 @@
         container.innerHTML += `
           <div class="p-3.5 border rounded-2xl flex items-center justify-between gap-3 ${isUnlocked ? 'bg-emerald-50/60 border-emerald-200' : 'bg-white border-slate-200'}">
             <div class="flex items-center gap-3">
-              <span class="text-2xl p-2 bg-slate-100 rounded-xl">${item.icon}</span>
+              <!-- รูปภาพไอเทมร้านค้า -->
+              <img src="${item.image}" alt="${item.name}" class="w-10 h-10 object-contain p-1 bg-slate-100 rounded-xl" onerror="this.src='https://via.placeholder.com/40'">
               <div>
                 <div class="text-xs font-bold text-slate-800">${item.name}</div>
                 <div class="text-[11px] text-slate-400 leading-tight">${item.desc}</div>
@@ -329,7 +355,6 @@
       });
     }
 
-    // ฟังก์ชันสุ่ม Points 1-10 และบันทึกวันที่ทำภารกิจ
     window.claimTaskPoints = async function(taskId) {
       const todayStr = getTodayString();
       const lastDoneDate = localStorage.getItem(`task_${taskId}_${currentUser.id}`);
@@ -339,7 +364,6 @@
         return;
       }
 
-      // สุ่มแต้ม 1 - 10
       const randomPoints = Math.floor(Math.random() * 10) + 1;
       const newPoints = Number(userPoints) + randomPoints;
 
@@ -350,12 +374,10 @@
 
       if (!error) {
         userPoints = newPoints;
-        // บันทึกว่าวันนี้ทำภารกิจนี้ไปแล้ว
         localStorage.setItem(`task_${taskId}_${currentUser.id}`, todayStr);
-        
         alert(`🎉 ยินดีด้วย! คุณสุ่มได้ +${randomPoints} Points`);
         updatePointsUI();
-        renderTasks(); // รีเรนเดอร์เพื่อล็อกปุ่ม
+        renderTasks();
       } else {
         alert('เกิดข้อผิดพลาดในการบันทึกแต้ม: ' + error.message);
       }
