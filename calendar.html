@@ -84,7 +84,22 @@
           <p class="text-xs text-slate-400 mt-1" id="holidayMonthLabel">ประจำเดือนมกราคม 2569</p>
         </div>
 
-        <div id="holidaysList" class="space-y-3 overflow-y-auto max-h-[500px] pr-1 flex-1">
+        <!-- การ์ดแสดงรวมจำนวนวันหยุดประจำเดือน -->
+        <div class="bg-indigo-50/70 border border-indigo-100 rounded-2xl p-4 flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-indigo-600">🌴 วันหยุดทั้งหมดในเดือนนี้</div>
+            <div class="text-xs text-slate-500 mt-0.5">(เสาร์-อาทิตย์ + ราชการ)</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="totalHolidaysCount" class="text-2xl font-black text-indigo-700">0</span>
+            <span class="text-xs font-bold text-indigo-600">วัน</span>
+            <button onclick="window.editTotalHolidays()" class="ml-1 text-[11px] bg-white border border-indigo-200 text-indigo-600 font-bold px-2 py-1 rounded-lg hover:bg-indigo-600 hover:text-white transition shadow-sm">
+              ✏️ แก้ไข
+            </button>
+          </div>
+        </div>
+
+        <div id="holidaysList" class="space-y-3 overflow-y-auto max-h-[450px] pr-1 flex-1">
           <!-- Holidays & Custom Events JS Generated -->
         </div>
       </div>
@@ -93,23 +108,28 @@
 
   </main>
 
-  <!-- Modal สำหรับเพิ่มกำหนดการ -->
+  <!-- Modal สำหรับเพิ่ม/จัดการกำหนดการ -->
   <div id="eventModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
     <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-100 space-y-4">
       <div class="flex justify-between items-center">
-        <h3 class="text-lg font-extrabold text-slate-800" id="modalTitle">📌 เพิ่มกำหนดการ</h3>
+        <h3 class="text-lg font-extrabold text-slate-800" id="modalTitle">📌 กำหนดการ</h3>
         <button onclick="window.closeEventModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
       </div>
-      <p class="text-xs text-slate-500" id="modalSelectedDateText"></p>
+      <p class="text-xs text-slate-500 font-medium" id="modalSelectedDateText"></p>
       
-      <div>
-        <label class="block text-xs font-bold text-slate-600 mb-1">หัวข้อกิจกรรม / กำหนดการ</label>
+      <!-- รายการกิจกรรมเดิมในวันนั้น (สามารถลบได้) -->
+      <div id="modalExistingEventsList" class="space-y-2 max-h-40 overflow-y-auto">
+        <!-- JS Rendered -->
+      </div>
+
+      <div class="border-t border-slate-100 pt-3">
+        <label class="block text-xs font-bold text-slate-600 mb-1">เพิ่มกำหนดการใหม่</label>
         <input type="text" id="eventInput" placeholder="เช่น สอบกลางภาค, อ่านชีวะ บทที่ 3" class="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-indigo-500 text-sm font-medium">
       </div>
 
       <div class="flex justify-end gap-2 pt-2">
-        <button onclick="window.closeEventModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">ยกเลิก</button>
-        <button onclick="window.saveUserEvent()" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition shadow-sm">บันทึกกำหนดการ</button>
+        <button onclick="window.closeEventModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">ปิดหน้าต่าง</button>
+        <button onclick="window.saveUserEvent()" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition shadow-sm">+ บันทึกเพิ่ม</button>
       </div>
     </div>
   </div>
@@ -121,6 +141,7 @@
     let currentDate = new Date(2026, 0, 1); // ค่าเริ่มต้น 2026
     let selectedDateStr = null;
     let userEvents = {}; // เก็บกิจกรรมส่วนตัว { 'YYYY-MM-DD': [' event1 ', ' event2 '] }
+    let customHolidaysCount = {}; // เก็บวันหยุดที่แก้ไขเอง { 'YYYY-MM': number }
 
     // ข้อมูลวันหยุดและวันสำคัญปี 2569 (2026)
     const holidays2026 = [
@@ -174,6 +195,9 @@
         // โหลดข้อมูลกิจกรรมของ User จาก localStorage
         loadStoredUserEvents();
 
+        // โหลดข้อมูลวันหยุดที่ปรับแก้เอง
+        loadCustomHolidaysCount();
+
         // โหลดเดือนล่าสุดที่เปิดไว้ครั้งล่าสุด
         loadLastVisitedMonth();
 
@@ -219,6 +243,23 @@
       localStorage.setItem(`userEvents_${currentUser.id}`, JSON.stringify(userEvents));
     }
 
+    // โหลดจำนวนวันหยุดที่ผู้ใช้แก้ไขเอง
+    function loadCustomHolidaysCount() {
+      const saved = localStorage.getItem(`customHolidays_${currentUser.id}`);
+      if (saved) {
+        try {
+          customHolidaysCount = JSON.parse(saved);
+        } catch (e) {
+          customHolidaysCount = {};
+        }
+      }
+    }
+
+    // บันทึกจำนวนวันหยุดที่ผู้ใช้แก้ไขเอง
+    function saveCustomHolidaysCount() {
+      localStorage.setItem(`customHolidays_${currentUser.id}`, JSON.stringify(customHolidaysCount));
+    }
+
     async function loadUserData() {
       const { data, error } = await supabase
         .from('profiles')
@@ -259,10 +300,23 @@
       const currentMonthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
       const monthHolidays = holidays2026.filter(h => h.date.startsWith(currentMonthStr));
 
+      let autoHolidaysCount = 0;
+
       // Days of the month
       for (let day = 1; day <= daysInMonth; day++) {
+        const dateObj = new Date(year, month, day);
+        const dayOfWeek = dateObj.getDay(); // 0 = Sun, 6 = Sat
+        const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+
         const dateStr = `${currentMonthStr}-${String(day).padStart(2, '0')}`;
         const dayHolidays = holidays2026.filter(h => h.date === dateStr);
+        const hasOfficialHoliday = dayHolidays.some(h => h.type === 'official');
+
+        // คำนวณวันหยุดทั้งหมด (เสาร์-อาทิตย์ + วันหยุดราชการแบบไม่นับซ้ำ)
+        if (isWeekend || hasOfficialHoliday) {
+          autoHolidaysCount++;
+        }
+
         const myEvents = userEvents[dateStr] || [];
 
         let badgeHtml = '';
@@ -270,8 +324,7 @@
 
         // วันหยุดราชการ/ประเพณี
         if (dayHolidays.length > 0) {
-          const hasOfficial = dayHolidays.some(h => h.type === 'official');
-          if (hasOfficial) {
+          if (hasOfficialHoliday) {
             cellBg = 'bg-rose-50/70 border-rose-200 hover:border-rose-400';
             badgeHtml += `<div class="text-[10px] bg-rose-500 text-white font-bold p-1 rounded-lg truncate mt-1 shadow-sm">${dayHolidays[0].title}</div>`;
           } else {
@@ -288,7 +341,7 @@
         grid.innerHTML += `
           <div onclick="window.openEventModal('${dateStr}')" class="h-24 sm:h-28 p-2 rounded-2xl border ${cellBg} flex flex-col justify-between transition cursor-pointer shadow-sm overflow-hidden group">
             <div class="flex justify-between items-center">
-              <span class="font-bold text-sm ${dayHolidays.some(h=>h.type==='official') ? 'text-rose-600' : 'text-slate-700'}">${day}</span>
+              <span class="font-bold text-sm ${hasOfficialHoliday ? 'text-rose-600' : (isWeekend ? 'text-rose-400' : 'text-slate-700')}">${day}</span>
               <span class="text-xs text-indigo-400 opacity-0 group-hover:opacity-100 font-bold transition">+ เพิ่ม</span>
             </div>
             <div class="space-y-1 overflow-hidden">${badgeHtml}</div>
@@ -296,9 +349,30 @@
         `;
       }
 
+      // แสดงผลจำนวนวันหยุด (หากมีการปรับแก้ให้ใช้ค่าปรับแก้ มิฉะนั้นใช้ค่าอัตโนมัติ)
+      const displayHolidays = customHolidaysCount[currentMonthStr] !== undefined 
+        ? customHolidaysCount[currentMonthStr] 
+        : autoHolidaysCount;
+      document.getElementById('totalHolidaysCount').innerText = displayHolidays;
+
       // Render Sidebar List
       renderSidebarEvents(currentMonthStr, monthHolidays);
     }
+
+    // แก้ไขจำนวนวันหยุดรวม
+    window.editTotalHolidays = function() {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const currentMonthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
+      const currentVal = document.getElementById('totalHolidaysCount').innerText;
+
+      const newCount = prompt(`กำหนดจำนวนวันหยุดทั้งหมดในเดือน ${thaiMonths[month]} ${year + 543}:`, currentVal);
+      if (newCount !== null && !isNaN(newCount) && newCount.trim() !== '') {
+        customHolidaysCount[currentMonthStr] = parseInt(newCount.trim());
+        saveCustomHolidaysCount();
+        renderCalendar();
+      }
+    };
 
     function renderSidebarEvents(currentMonthStr, monthHolidays) {
       const holidaysListContainer = document.getElementById('holidaysList');
@@ -308,7 +382,7 @@
       Object.keys(userEvents).forEach(date => {
         if (date.startsWith(currentMonthStr)) {
           userEvents[date].forEach((evt, idx) => {
-            monthUserEvents.push({ date, title: evt, type: 'user', index: idx });
+            monthUserEvents.push({ date, title: evt, index: idx });
           });
         }
       });
@@ -316,7 +390,7 @@
       if (monthHolidays.length === 0 && monthUserEvents.length === 0) {
         holidaysListContainer.innerHTML = `
           <div class="text-center py-12 text-slate-400 text-sm">
-            🎈 เดือนนี้ไม่มีวันหยุดหรือกำหนดการ
+            🎈 เดือนนี้ไม่มีวันหยุดพิเศษหรือกำหนดการ
             <p class="text-xs text-slate-300 mt-1">คลิกที่ช่องวันที่ในปฏิทินเพื่อเพิ่มกำหนดการได้</p>
           </div>
         `;
@@ -358,7 +432,9 @@
                 <div class="text-sm font-bold text-slate-800 leading-snug">${item.title}</div>
               </div>
             </div>
-            <button onclick="window.deleteUserEvent('${item.date}', ${item.index})" class="text-slate-300 hover:text-rose-500 font-bold text-xs p-1 transition">ลบ</button>
+            <button onclick="window.deleteUserEvent('${item.date}', ${item.index})" class="text-slate-400 hover:text-rose-500 font-bold text-xs p-1.5 rounded-lg hover:bg-rose-50 transition shrink-0" title="ลบรายการ">
+              🗑️ ลบ
+            </button>
           </div>
         `;
       });
@@ -372,8 +448,32 @@
       const [y, m, d] = dateStr.split('-');
       document.getElementById('modalSelectedDateText').innerText = `วันที่ ${parseInt(d)} ${thaiMonths[parseInt(m)-1]} ${parseInt(y)+543}`;
       document.getElementById('eventInput').value = '';
+      
+      renderModalExistingEvents();
       document.getElementById('eventModal').classList.remove('hidden');
     };
+
+    // แสดงรายการกิจกรรมที่มีอยู่ใน Modal พร้อมปุ่มลบ
+    function renderModalExistingEvents() {
+      const container = document.getElementById('modalExistingEventsList');
+      const list = userEvents[selectedDateStr] || [];
+
+      if (list.length === 0) {
+        container.innerHTML = `<div class="text-xs text-slate-400 italic">ยังไม่มีกำหนดการส่วนตัวในวันนี้</div>`;
+        return;
+      }
+
+      let html = `<div class="text-xs font-bold text-slate-600 mb-1">รายการที่มีอยู่:</div>`;
+      list.forEach((evt, idx) => {
+        html += `
+          <div class="flex items-center justify-between bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs">
+            <span class="font-medium text-slate-700 truncate mr-2">📌 ${evt}</span>
+            <button onclick="window.deleteUserEvent('${selectedDateStr}', ${idx})" class="text-rose-500 hover:text-rose-700 font-bold hover:underline shrink-0">ลบ</button>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
 
     window.closeEventModal = function() {
       document.getElementById('eventModal').classList.add('hidden');
@@ -389,7 +489,8 @@
       }
       userEvents[selectedDateStr].push(val);
       saveStoredUserEvents();
-      window.closeEventModal();
+      document.getElementById('eventInput').value = '';
+      renderModalExistingEvents();
       renderCalendar();
     };
 
@@ -400,6 +501,9 @@
           delete userEvents[dateStr];
         }
         saveStoredUserEvents();
+        if (selectedDateStr === dateStr) {
+          renderModalExistingEvents();
+        }
         renderCalendar();
       }
     };
