@@ -138,7 +138,6 @@
 
     let currentUser = null;
     let userPoints = 0;
-    let totalStudyMinutes = 0; // เก็บนาทีการเรียนรวม
     
     // Timer Variables
     let timer = null;
@@ -178,16 +177,15 @@
     });
 
     async function loadUserData() {
-      // ดึงข้อมูล points และ total_study_time จาก profiles
+      // ดึงแต้มผู้ใช้จาก profiles
       const { data, error } = await supabase
         .from('profiles')
-        .select('points, total_study_time')
+        .select('points')
         .eq('id', currentUser.id)
         .single();
 
       if (data && !error) {
         userPoints = parseFloat(data.points) || 0;
-        totalStudyMinutes = parseInt(data.total_study_time) || 0;
         document.getElementById('userPointsDisplay').innerText = userPoints;
       }
     }
@@ -286,23 +284,19 @@
         const minsRead = Math.floor(studyDuration / 60);
 
         if (currentTechnique === 'custom') {
-          // คำนวณแบบ 1 นาที = 0.5 Point
           pointsEarned = minsRead * 0.5;
         } else {
-          // ครบเทคนิคได้ 50 Points
           pointsEarned = 50;
         }
 
         userPoints += pointsEarned;
-        totalStudyMinutes += minsRead; // รวมเวลาเรียนเพิ่มขึ้น
         document.getElementById('userPointsDisplay').innerText = userPoints;
         
-        // 1. อัปเดตข้อมูลรวมลงในตาราง profiles
+        // 1. บันทึก/อัปเดตแต้มลงตาราง profiles
         const { error: profileError } = await supabase
           .from('profiles')
           .update({ 
             points: userPoints,
-            total_study_time: totalStudyMinutes,
             updated_at: new Date().toISOString()
           })
           .eq('id', currentUser.id);
@@ -311,19 +305,25 @@
           console.error('Error updating profile:', profileError.message);
         }
 
-        // 2. บันทึกรายละเอียดรอบลงตาราง study_logs (ถ้ามีตารางนี้อยู่)
+        // 2. บันทึกข้อมูลเซสชันการเรียนลงตาราง study_sessions
         try {
-          await supabase.from('study_logs').insert([
-            {
-              user_id: currentUser.id,
-              technique: currentTechnique,
-              duration_minutes: minsRead,
-              points_earned: pointsEarned,
-              created_at: new Date().toISOString()
-            }
-          ]);
+          const { error: sessionError } = await supabase
+            .from('study_sessions')
+            .insert([
+              {
+                user_id: currentUser.id,
+                duration_minutes: minsRead,
+                technique: currentTechnique,
+                points_earned: pointsEarned,
+                created_at: new Date().toISOString()
+              }
+            ]);
+
+          if (sessionError) {
+            console.error('Error inserting study_session:', sessionError.message);
+          }
         } catch (e) {
-          console.log('Log table missing or non-critical error:', e);
+          console.error('Study Session error:', e);
         }
 
         alert(`🎉 ยินดีด้วย! คุณอ่านหนังสือครบช่วงเวลา ${minsRead} นาทีแล้ว!\nได้รับ +${pointsEarned} Points!`);
