@@ -1,80 +1,40 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MindStudy AI - เข้าสู่ระบบ</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+<script type="module">
+  import { supabase } from './js/supabase-config.js';
 
-  <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-200">
-    <div class="text-center mb-6">
-      <h1 class="text-3xl font-bold text-indigo-600">🧠 MindStudy AI</h1>
-      <p class="text-slate-500 text-sm mt-1">ระบบวางแผนการเรียน & ดูแลสุขภาพจิต</p>
-    </div>
+  let currentMode = 'login';
 
-    <!-- Toggle Tab -->
-    <div class="flex mb-6 border-b">
-      <button id="loginTabBtn" onclick="switchTab('login')" class="w-1/2 py-2 font-semibold text-indigo-600 border-b-2 border-indigo-600">เข้าสู่ระบบ</button>
-      <button id="signupTabBtn" onclick="switchTab('signup')" class="w-1/2 py-2 font-semibold text-slate-400 border-b-2 border-transparent">สมัครสมาชิก</button>
-    </div>
+  // ผูกฟังก์ชันเข้ากับ window เพื่อให้ onclick ใน HTML เรียกหาเจอ
+  window.switchTab = function(mode) {
+    currentMode = mode;
+    const loginBtn = document.getElementById('loginTabBtn');
+    const signupBtn = document.getElementById('signupTabBtn');
+    const submitBtn = document.getElementById('submitBtn');
 
-    <!-- Form -->
-    <div class="space-y-4">
-      <div>
-        <label class="block text-xs font-bold text-slate-600 mb-1">อีเมล</label>
-        <input id="emailInput" type="email" placeholder="student@example.com" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-400 text-sm">
-      </div>
-      <div>
-        <label class="block text-xs font-bold text-slate-600 mb-1">รหัสผ่าน</label>
-        <input id="passwordInput" type="password" placeholder="••••••••" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-400 text-sm">
-      </div>
+    if (mode === 'login') {
+      loginBtn.className = "w-1/2 py-2 font-semibold text-indigo-600 border-b-2 border-indigo-600";
+      signupBtn.className = "w-1/2 py-2 font-semibold text-slate-400 border-b-2 border-transparent";
+      submitBtn.innerText = "เข้าสู่ระบบ";
+    } else {
+      signupBtn.className = "w-1/2 py-2 font-semibold text-indigo-600 border-b-2 border-indigo-600";
+      loginBtn.className = "w-1/2 py-2 font-semibold text-slate-400 border-b-2 border-transparent";
+      submitBtn.innerText = "ลงทะเบียนสมัครสมาชิก";
+    }
+  };
 
-      <button id="submitBtn" onclick="handleAuth()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold transition shadow-md">
-        เข้าสู่ระบบ
-      </button>
-    </div>
-  </div>
+  window.handleAuth = async function() {
+    const email = document.getElementById('emailInput').value;
+    const password = document.getElementById('passwordInput').value;
 
-  <script type="module">
-    import { supabase } from './js/supabase-config.js';
+    if (!email || !password) return alert('กรุณากรอกข้อมูลให้ครบถ้วน');
 
-    let currentMode = 'login';
-
-    window.switchTab = (mode) => {
-      currentMode = mode;
-      const loginBtn = document.getElementById('loginTabBtn');
-      const signupBtn = document.getElementById('signupTabBtn');
-      const submitBtn = document.getElementById('submitBtn');
-
-      if (mode === 'login') {
-        loginBtn.className = "w-1/2 py-2 font-semibold text-indigo-600 border-b-2 border-indigo-600";
-        signupBtn.className = "w-1/2 py-2 font-semibold text-slate-400 border-b-2 border-transparent";
-        submitBtn.innerText = "เข้าสู่ระบบ";
-      } else {
-        signupBtn.className = "w-1/2 py-2 font-semibold text-indigo-600 border-b-2 border-indigo-600";
-        loginBtn.className = "w-1/2 py-2 font-semibold text-slate-400 border-b-2 border-transparent";
-        submitBtn.innerText = "ลงทะเบียนสมัครสมาชิก";
-      }
-    };
-
-    window.handleAuth = async () => {
-      const email = document.getElementById('emailInput').value;
-      const password = document.getElementById('passwordInput').value;
-
-      if (!email || !password) return alert('กรุณากรอกข้อมูลให้ครบถ้วน');
-
-      if (currentMode === 'login') {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message);
-        else window.location.href = 'dashboard.html';
-      } else {
-        const { data, error } = await supabase.auth.signUp({ email, password });
-        if (error) alert('สมัครสมาชิกไม่สำเร็จ: ' + error.message);
-        else alert('สมัครสมาชิกสำเร็จ! กรุณากดเข้าสู่ระบบ');
-      }
-    };
-  </script>
-</body>
-</html>
+    if (currentMode === 'login') {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message);
+      else window.location.href = 'dashboard.html';
+    } else {
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) alert('สมัครสมาชิกไม่สำเร็จ: ' + error.message);
+      else alert('สมัครสมาชิกสำเร็จ! กรุณากดเข้าสู่ระบบ');
+    }
+  };
+</script>
