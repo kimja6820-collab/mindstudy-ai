@@ -67,7 +67,7 @@
             <p class="text-xs text-slate-400 mt-1">บันทึกความรู้สึกได้สูงสุด 3 ครั้ง/วัน</p>
           </div>
           <span class="text-xs font-bold px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full" id="dailyLimitBadge">
-            โควต้าวันนี้: 0/3
+            โควต้าคงเหลือวันนี้: 3/3 ครั้ง
           </span>
         </div>
 
@@ -95,10 +95,10 @@
 
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-2">2. เล่าความรู้สึกหรือสิ่งที่เจอในวันนี้ (ไดอารี่)</label>
-          <textarea id="diaryInput" rows="4" placeholder="วันนี้รู้สึกอย่างไรบ้าง มีเรื่องอะไรกังวลใจไหม..." class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-400 text-sm"></textarea>
+          <textarea id="diaryInput" rows="4" placeholder="วันนี้รู้สึกอย่างไรบ้าง มีเรื่องอะไรกังวลใจไหม..." class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-400 text-sm disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"></textarea>
         </div>
 
-        <button id="saveDiaryBtn" onclick="window.handleSaveDiary()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-2xl transition shadow-md">
+        <button id="saveDiaryBtn" onclick="window.handleSaveDiary()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-2xl transition shadow-md disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed disabled:shadow-none">
           บันทึกไดอารี่ (+20 Points)
         </button>
       </div>
@@ -111,6 +111,107 @@
       </div>
     </section>
   </main>
+
+  <!-- Modal โหมดเครียดที่สุด (สีแดง) -->
+  <div id="extremeStressModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full border-2 border-rose-200 shadow-2xl overflow-hidden animate-fade-in">
+      <div class="bg-rose-500 text-white p-5 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">🚨</span>
+          <h3 class="font-extrabold text-lg">ศูนย์ความช่วยเหลือสุขภาพจิต</h3>
+        </div>
+        <button onclick="window.closeModal('extremeStressModal')" class="text-white hover:bg-rose-600 rounded-full w-8 h-8 flex items-center justify-center transition">✕</button>
+      </div>
+      <div class="p-6 space-y-4 text-slate-700">
+        <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4 text-center">
+          <p class="text-xs font-bold text-rose-500 uppercase tracking-wide">สายด่วนสุขภาพจิต (ฟรี 24 ชม.)</p>
+          <a href="tel:1323" class="text-4xl font-black text-rose-600 my-1 block hover:underline">📞 1323</a>
+          <p class="text-xs text-rose-700">โดยกรมสุขภาพจิต กระทรวงสาธารณสุข</p>
+        </div>
+        
+        <div class="space-y-2 text-sm">
+          <p class="font-bold text-slate-800">💡 บริการคำปรึกษาฟรี โดยนักจิตวิทยาและผู้เชี่ยวชาญ:</p>
+          <ul class="list-disc list-inside space-y-1 text-xs text-slate-600 pl-1">
+            <li>ความเครียด ความกังวล และภาวะซึมเศร้า</li>
+            <li>ความสูญเสีย และปัญหาความสัมพันธ์/ครอบครัว</li>
+            <li>ภาวะหมดไฟ การกลั่นแกล้ง และความคิดทำร้ายตัวเอง</li>
+          </ul>
+        </div>
+
+        <div class="bg-slate-50 rounded-2xl p-4 space-y-2 text-xs border border-slate-100">
+          <p class="font-bold text-slate-700">🌐 ช่องทางรับความช่วยเหลือเพิ่มเติม:</p>
+          <div class="flex flex-col gap-1.5">
+            <a href="https://1323alltime.camri.go.th/" target="_blank" class="text-indigo-600 hover:underline flex items-center gap-1 font-semibold">
+              🔗 ระบบนัดปรึกษาออนไลน์ 1323 All Time
+            </a>
+            <a href="https://www.dmh.go.th/" target="_blank" class="text-indigo-600 hover:underline flex items-center gap-1 font-semibold">
+              🔗 เว็บไซต์กรมสุขภาพจิต (dmh.go.th)
+            </a>
+          </div>
+        </div>
+
+        <button onclick="window.closeModal('extremeStressModal')" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl transition">
+          รับทราบ / รับข้อความช่วยเหลือแล้ว
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal โหมดเครียดมาก (สีเหลือง) -->
+  <div id="highStressModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full border-2 border-amber-200 shadow-2xl overflow-hidden animate-fade-in">
+      <div class="bg-amber-500 text-white p-5 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">💡</span>
+          <h3 class="font-extrabold text-lg">วิธีผ่อนคลายความเครียดระยะเร่งด่วน</h3>
+        </div>
+        <button onclick="window.closeModal('highStressModal')" class="text-white hover:bg-amber-600 rounded-full w-8 h-8 flex items-center justify-center transition">✕</button>
+      </div>
+      <div class="p-6 space-y-4 text-slate-700">
+        <p class="text-sm font-medium text-slate-600">
+          รับรู้ได้ว่าตอนนี้คุณกำลังเผชิญกับความเครียด ลองใช้เวลาสัก 2-3 นาทีทำตามเทคนิคเหล่านี้ดูนะครับ:
+        </p>
+
+        <div class="space-y-3">
+          <div class="flex items-start gap-3 bg-amber-50/60 p-3 rounded-2xl border border-amber-100">
+            <span class="text-xl">🫁</span>
+            <div>
+              <h4 class="text-sm font-bold text-amber-900">1. ฝึกหายใจแบบ 4-7-8</h4>
+              <p class="text-xs text-amber-800">หายใจเข้าทางจมูก 4 วินาที, กลั้นหายใจไว้ 7 วินาที, แล้วค่อยๆ ผ่อนลมหายใจออกทางปาก 8 วินาที (ทำซ้ำ 3-4 รอบ)</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 bg-amber-50/60 p-3 rounded-2xl border border-amber-100">
+            <span class="text-xl">💧</span>
+            <div>
+              <h4 class="text-sm font-bold text-amber-900">2. พักดื่มน้ำและล้างหน้า</h4>
+              <p class="text-xs text-amber-800">จิบน้ำเย็นช้าๆ หรือใช้น้ำเย็นล้างหน้า เพื่อช่วยกระตุ้นระบบประสาทให้ผ่อนคลายลง</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 bg-amber-50/60 p-3 rounded-2xl border border-amber-100">
+            <span class="text-xl">👀</span>
+            <div>
+              <h4 class="text-sm font-bold text-amber-900">3. ใช้เทคนิค 20-20-20</h4>
+              <p class="text-xs text-amber-800">ละสายตาจากหน้าจอหรือหนังสือ ไปมองวัตถุที่อยู่ไกลออกไปประมาณ 20 ฟุต เป็นเวลา 20 วินาที</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 bg-amber-50/60 p-3 rounded-2xl border border-amber-100">
+            <span class="text-xl">🎵</span>
+            <div>
+              <h4 class="text-sm font-bold text-amber-900">4. ฟังเพลงสบายๆ หรือเพลงคลื่นสมอง</h4>
+              <p class="text-xs text-amber-800">เปิดดนตรีบรรเลงหรือ Lo-Fi จังหวะช้า เพื่อช่วยปรับคลื่นสมองให้อยู่ในภาวะผ่อนคลาย</p>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="window.closeModal('highStressModal')" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl transition">
+          ลองทำตามดูเลย
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script type="module">
     import { supabase } from './js/supabase-config.js';
@@ -133,6 +234,11 @@
       await loadTodayDiaries();
     });
 
+    function getStartOfToday() {
+      const now = new Date();
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    }
+
     async function loadUserData() {
       const { data, error } = await supabase
         .from('profiles')
@@ -148,6 +254,9 @@
     }
 
     window.selectStress = function(level, emoji, event) {
+      const saveBtn = document.getElementById('saveDiaryBtn');
+      if (saveBtn.disabled) return;
+
       selectedStress = level;
       selectedEmoji = emoji;
       document.querySelectorAll('.stress-btn').forEach(btn => {
@@ -156,15 +265,33 @@
       if (event && event.currentTarget) {
         event.currentTarget.classList.add('border-indigo-600', 'bg-indigo-50');
       }
+
+      // แสดง Popup ตามระดับความเครียดที่เลือก
+      if (level === 'เครียดที่สุด') {
+        document.getElementById('extremeStressModal').classList.remove('hidden');
+      } else if (level === 'เครียดมาก') {
+        document.getElementById('highStressModal').classList.remove('hidden');
+      }
     };
+
+    window.closeModal = function(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    };
+
+    // ปิด Modal เมื่อคลิกที่พื้นหลังดำ
+    window.addEventListener('click', (e) => {
+      const extremeModal = document.getElementById('extremeStressModal');
+      const highModal = document.getElementById('highStressModal');
+      if (e.target === extremeModal) extremeModal.classList.add('hidden');
+      if (e.target === highModal) highModal.classList.add('hidden');
+    });
 
     window.handleSaveDiary = async function() {
       const diaryText = document.getElementById('diaryInput').value.trim();
       if (!selectedStress) return alert('กรุณาเลือกระดับความเครียด');
       if (!diaryText) return alert('กรุณากรอกข้อความไดอารี่');
 
-      const today = new Date();
-      const startOfTodayISO = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+      const startOfTodayISO = getStartOfToday().toISOString();
 
       const { data: todayEntries } = await supabase
         .from('diaries')
@@ -173,10 +300,11 @@
         .gte('created_at', startOfTodayISO);
 
       if (todayEntries && todayEntries.length >= 3) {
-        return alert('คุณบันทึกไดอารี่ครบ 3 ครั้งสำหรับวันนี้แล้วครับ');
+        alert('คุณบันทึกไดอารี่ครบ 3 ครั้งสำหรับวันนี้แล้วครับ');
+        await loadTodayDiaries();
+        return;
       }
 
-      // 1. บันทึกไดอารี่
       const { error: diaryErr } = await supabase.from('diaries').insert([{
         user_id: currentUser.id,
         stress_level: selectedStress,
@@ -189,7 +317,6 @@
         return;
       }
 
-      // 2. บวกแต้ม 20 Points ให้ User
       const { data: profile } = await supabase.from('profiles').select('points').eq('id', currentUser.id).single();
       const newPoints = (profile?.points || 0) + 20;
 
@@ -197,6 +324,12 @@
 
       alert('บันทึกสำเร็จ! คุณได้รับ +20 Points');
       document.getElementById('diaryInput').value = '';
+      selectedStress = '';
+      selectedEmoji = '';
+      document.querySelectorAll('.stress-btn').forEach(btn => {
+        btn.classList.remove('border-indigo-600', 'bg-indigo-50');
+      });
+
       await loadUserData();
       await loadTodayDiaries();
     };
@@ -209,12 +342,38 @@
         .order('created_at', { ascending: false });
 
       const historyContainer = document.getElementById('historyList');
-      const today = new Date();
-      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const startOfToday = getStartOfToday();
 
       if (data) {
         const todayCount = data.filter(item => item.created_at && new Date(item.created_at) >= startOfToday).length;
-        document.getElementById('dailyLimitBadge').innerText = `โควต้าวันนี้: ${todayCount}/3`;
+        const remainingQuota = Math.max(0, 3 - todayCount);
+
+        const badge = document.getElementById('dailyLimitBadge');
+        const saveBtn = document.getElementById('saveDiaryBtn');
+        const diaryInput = document.getElementById('diaryInput');
+        const stressButtons = document.querySelectorAll('.stress-btn');
+
+        if (todayCount >= 3) {
+          badge.innerText = `โควต้าคงเหลือวันนี้: 0/3 ครั้ง (ครบกำหนดแล้ว)`;
+          badge.className = "text-xs font-bold px-3 py-1 bg-rose-100 text-rose-600 rounded-full border border-rose-200";
+          
+          saveBtn.disabled = true;
+          saveBtn.innerText = "วันนี้คุณบันทึกครบโควต้า 3 ครั้งแล้ว";
+          diaryInput.disabled = true;
+          diaryInput.placeholder = "วันนี้คุณบันทึกครบโควต้า 3 ครั้งแล้ว กลับมาบันทึกใหม่พรุ่งนี้นะครับ";
+
+          stressButtons.forEach(btn => btn.classList.add('opacity-50', 'cursor-not-allowed'));
+        } else {
+          badge.innerText = `โควต้าคงเหลือวันนี้: ${remainingQuota}/3 ครั้ง`;
+          badge.className = "text-xs font-bold px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full";
+          
+          saveBtn.disabled = false;
+          saveBtn.innerText = "บันทึกไดอารี่ (+20 Points)";
+          diaryInput.disabled = false;
+          diaryInput.placeholder = "วันนี้รู้สึกอย่างไรบ้าง มีเรื่องอะไรกังวลใจไหม...";
+
+          stressButtons.forEach(btn => btn.classList.remove('opacity-50', 'cursor-not-allowed'));
+        }
 
         if (data.length === 0) {
           historyContainer.innerHTML = `<p class="text-slate-400 text-sm text-center py-8">ยังไม่มีประวัติบันทึก</p>`;
