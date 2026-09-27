@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education Flashcards - แฟลชการ์ดเพื่อการศึกษา</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                            dark: '#0a192f',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-brand-900 to-slate-900 text-white min-h-screen flex flex-col justify-between font-sans">
+
+    <!-- Header -->
+    <header class="w-full py-6 px-4 text-center border-b border-sky-800/40 bg-slate-900/60 backdrop-blur-md">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-200">
+            Education Flashcards
+        </h1>
+        <p class="text-sky-300/80 text-sm md:text-base mt-1">แฟลชการ์ดเพื่อการเรียนรู้และพัฒนาทักษะการศึกษา</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col items-center justify-center p-4">
+        
+        <!-- Category Selector & Progress -->
+        <div class="w-full max-w-md flex justify-between items-center mb-4 text-sky-200 text-sm">
+            <span id="category-badge" class="px-3 py-1 rounded-full bg-sky-900/80 border border-sky-500/30 text-xs font-semibold uppercase tracking-wider text-sky-300">
+                Category
+            </span>
+            <span id="progress-text" class="font-medium">
+                Card 1 of 20
+            </span>
+        </div>
+
+        <!-- Flashcard Container -->
+        <div class="w-full max-w-md h-80 perspective-1000 cursor-pointer" id="flashcard-container">
+            <div id="flashcard" class="w-full h-full relative transform-style-3d transition-transform duration-500 rounded-2xl shadow-2xl shadow-sky-950/50">
+                
+                <!-- Front Side -->
+                <div class="absolute inset-0 w-full h-full rounded-2xl bg-gradient-to-br from-blue-900 to-sky-800 p-8 flex flex-col justify-between border border-sky-400/30 backface-hidden shadow-inner">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-sky-300/70 tracking-widest uppercase">คำถาม / หัวข้อ</span>
+                        <svg class="w-6 h-6 text-sky-300/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+                    </div>
+                    <div class="text-center my-auto">
+                        <h2 id="card-front-text" class="text-2xl md:text-3xl font-bold text-white tracking-wide">
+                            Loading...
+                        </h2>
+                    </div>
+                    <div class="text-center text-xs text-sky-300/60">
+                        คลิกเพื่อพลิกดูเฉลย
+                    </div>
+                </div>
+
+                <!-- Back Side -->
+                <div class="absolute inset-0 w-full h-full rounded-2xl bg-gradient-to-br from-slate-900 to-blue-950 p-8 flex flex-col justify-between border border-sky-500/40 rotate-y-180 backface-hidden shadow-inner">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-sky-400 tracking-widest uppercase">คำอธิบาย / คำตอบ</span>
+                        <svg class="w-6 h-6 text-sky-400/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div class="text-center my-auto">
+                        <p id="card-back-text" class="text-lg md:text-xl text-sky-100 leading-relaxed">
+                            Loading...
+                        </p>
+                    </div>
+                    <div class="text-center text-xs text-sky-400/60">
+                        คลิกอีกครั้งเพื่อพลิกกลับ
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="w-full max-w-md flex items-center justify-between mt-8 gap-4">
+            <button id="prev-btn" class="flex-1 bg-sky-900/60 hover:bg-sky-800 text-sky-200 py-3 rounded-xl border border-sky-600/40 transition-all font-semibold flex items-center justify-center gap-2 shadow-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                ย้อนกลับ
+            </button>
+
+            <button id="shuffle-btn" class="p-3 bg-sky-950 hover:bg-sky-900 text-sky-400 rounded-xl border border-sky-600/30 transition-all shadow-lg" title="สุ่มการ์ด">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            </button>
+
+            <button id="next-btn" class="flex-1 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white py-3 rounded-xl transition-all font-semibold flex items-center justify-center gap-2 shadow-lg shadow-sky-600/30">
+                ถัดไป
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-xs text-sky-400/50">
+        Education Flashcard Application &bull; Hosted on GitHub
+    </footer>
+
+    <!-- JavaScript Data and App Logic -->
+    <script>
+        const flashcards = [
+            {
+                front: "Pedagogy",
+                back: "ศาสตร์และศิลป์แห่งการสอนเด็ก หรือวิธีการสอนโดยเน้นผู้เรียนและครูเป็นศูนย์กลางการเรียนรู้",
+                category: "Terminology"
+            },
+            {
+                front: "Andragogy",
+                back: "แนวทางการจัดการเรียนรู้สำหรับผู้ใหญ่ (Adult Learning) ที่เน้นประสบการณ์และการนำไปใช้จริง",
+                category: "Terminology"
+            },
+            {
+                front: "Bloom's Taxonomy",
+                back: "การจำแนกวัตถุประสงค์การเรียนรู้ 6 ระดับ: จำ -> เข้าใจ -> ประยุกต์ใช้ -> วิเคราะห์ -> ประเมินค่า -> สร้างสรรค์",
+                category: "Theory"
+            },
+            {
+                front: "Formative Assessment",
+                back: "การประเมินเพื่อปรับปรุงและพัฒนาการเรียนรู้ระหว่างกระบวนการสอน (เช่น ควิซสั้น, การตั้งคำถาม)",
+                category: "Assessment"
+            },
+            {
+                front: "Summative Assessment",
+                back: "การประเมินเพื่อสรุปผลการเรียนรู้เมื่อจบหน่วยการเรียนหรือจบภาคเรียน (เช่น ข้อสอบปลายภาค)",
+                category: "Assessment"
+            },
+            {
+                front: "Scaffolding",
+                back: "การให้ความช่วยเหลือและชี้แนะชั่วคราวจากครูแก่ผู้เรียน แล้วค่อยๆ ลดการช่วยเหลือลงเมื่อผู้เรียนเริ่มทำเองได้",
+                category: "Strategy"
+            },
+            {
+                front: "Zone of Proximal Development (ZPD)",
+                back: "ระยะห่างระหว่างสิ่งที่ผู้เรียนทำได้ด้วยตนเอง กับสิ่งที่ทำได้เมื่อได้รับคำแนะนำหรือความช่วยเหลือ (แนวคิดโดย Vygotsky)",
+                category: "Theory"
+            },
+            {
+                front: "Active Learning",
+                back: "กระบวนการเรียนรู้ที่ให้ผู้เรียนมีส่วนร่วมในการคิด วิเคราะห์ ทำกิจกรรม และสรุปองค์ความรู้ด้วยตนเอง",
+                category: "Strategy"
+            },
+            {
+                front: "Flipped Classroom",
+                back: "ห้องเรียนกลับด้าน: ให้ผู้เรียนศึกษาเนื้อหาพื้นฐานมาก่อนที่บ้าน แล้วใช้เวลาในห้องเรียนเพื่อทำกิจกรรมและวิเคราะห์ร่วมกัน",
+                category: "Methodology"
+            },
+            {
+                front: "Gamification",
+                back: "การนำกลไกและองค์ประกอบของเกม (เช่น คะแนน, เหรียญรางวัล, ตารางคะแนน) มาประยุกต์ใช้ในการเรียนรู้",
+                category: "EdTech"
+            },
+            {
+                front: "Constructivism",
+                back: "ทฤษฎีการเรียนรู้ที่เชื่อว่า ผู้เรียนเป็นผู้สร้างความรู้ขึ้นเองผ่านประสบการณ์และการเชื่อมโยงกับความรู้เดิม",
+                category: "Theory"
+            },
+            {
+                front: "Differentiated Instruction",
+                back: "การปรับการสอนให้เหมาะกับความแตกต่างระหว่างบุคคลของผู้เรียน ทั้งในด้านเนื้อหา กระบวนการ และผลงาน",
+                category: "Strategy"
+            },
+            {
+                front: "Metacognition",
+                back: "กระบวนการรู้คิดของตนเอง (Thinking about thinking) หรือการรับรู้ว่าตนเองเรียนรู้และเข้าใจสิ่งต่างๆ อย่างไร",
+                category: "Psychology"
+            },
+            {
+                front: "Project-Based Learning (PBL)",
+                back: "การเรียนรู้โดยใช้โครงงานเป็นฐาน เน้นให้ผู้เรียนลงมือทำและแก้ปัญหาจริงเพื่อสร้างชิ้นงานหรือนวัตกรรม",
+                category: "Methodology"
+            },
+            {
+                front: "Microlearning",
+                back: "การย่อยเนื้อหาบทเรียนเป็นส่วนเล็กๆ สั้นๆ (3-5 นาที) เพื่อให้จดจำและเรียนรู้ได้สะดวกตามต้องการ",
+                category: "EdTech"
+            }
+        ];
+
+        let currentIndex = 0;
+        let isFlipped = false;
+
+        const cardElement = document.getElementById('flashcard');
+        const containerElement = document.getElementById('flashcard-container');
+        const frontText = document.getElementById('card-front-text');
+        const backText = document.getElementById('card-back-text');
+        const categoryBadge = document.getElementById('category-badge');
+        const progressText = document.getElementById('progress-text');
+
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const shuffleBtn = document.getElementById('shuffle-btn');
+
+        function updateCard() {
+            if (isFlipped) {
+                cardElement.classList.remove('rotate-y-180');
+                isFlipped = false;
+                setTimeout(renderContent, 200);
+            } else {
+                renderContent();
+            }
+        }
+
+        function renderContent() {
+            const currentCard = flashcards[currentIndex];
+            frontText.textContent = currentCard.front;
+            backText.textContent = currentCard.back;
+            categoryBadge.textContent = currentCard.category;
+            progressText.textContent = `Card ${currentIndex + 1} of ${flashcards.length}`;
+        }
+
+        containerElement.addEventListener('click', () => {
+            isFlipped = !isFlipped;
+            cardElement.classList.toggle('rotate-y-180', isFlipped);
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % flashcards.length;
+            updateCard();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+            updateCard();
+        });
+
+        shuffleBtn.addEventListener('click', () => {
+            for (let i = flashcards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+            }
+            currentIndex = 0;
+            updateCard();
+        });
+
+        // Key bindings for keyboard control
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextBtn.click();
+            if (e.key === 'ArrowLeft') prevBtn.click();
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                containerElement.click();
+            }
+        });
+
+        // Initialize first card
+        renderContent();
+    </script>
+</body>
+</html>
