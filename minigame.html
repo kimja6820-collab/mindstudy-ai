@@ -180,7 +180,7 @@
 
     let currentUser = null;
     let userPoints = 0;
-    let itemLevels = {}; // เก็บข้อมูลเลเวลของไอเทมแต่ละชิ้น เช่น { lamp: 1, plant: 2 }
+    let itemLevels = {};
 
     // รายการไอเทมพร้อมระบบเลเวล ( Max Lv.3 )
     const itemData = [
@@ -199,7 +199,7 @@
         levels: [
           { lvl: 1, name: 'กระบองเพชรจิ๋ว', price: 25, icon: '🌵' },
           { lvl: 2, name: 'ต้นมอนสเตอร่าด่าง', price: 60, icon: '🪴' },
-          { lvl: 3, name: 'กระถางสวนแนวตั้งอัจฉริยะ', price: 150, icon: 'เลเวลสูงสุด 🌳' }
+          { lvl: 3, name: 'กระถางสวนแนวตั้งอัจฉริยะ', price: 150, icon: '🌳' }
         ]
       },
       {
@@ -245,7 +245,11 @@
           return;
         }
         currentUser = user;
-        document.getElementById('userEmailDisplay').innerText = user.email;
+        
+        // แสดงชื่อ ยูสเซอร์ หรือ อีเมล
+        const displayName = user.user_metadata?.full_name || user.email;
+        document.getElementById('userEmailDisplay').innerText = displayName;
+        document.getElementById('userAvatar').innerText = displayName.charAt(0).toUpperCase();
 
         await loadProfileData();
         renderQuests();
@@ -266,7 +270,6 @@
       if (data) {
         userPoints = Number(data.points) || 0;
         
-        // ดึงข้อมูลเลเวล (เก็บใน unlocked_items รูปแบบ JSON Object เช่น {"lamp": 2, "cat": 1})
         if (typeof data.unlocked_items === 'object' && data.unlocked_items !== null && !Array.isArray(data.unlocked_items)) {
           itemLevels = data.unlocked_items;
         } else {
@@ -279,7 +282,6 @@
     function updateUI() {
       document.getElementById('headerPointsDisplay').innerText = userPoints;
 
-      // คำนวณเลเวลรวมของห้อง
       let totalLvl = 0;
       Object.values(itemLevels).forEach(lvl => totalLvl += Number(lvl));
       document.getElementById('totalLevelDisplay').innerText = `รวมระดับห้อง: Lv.${totalLvl}`;
@@ -323,7 +325,7 @@
             ${isDone ? `
               <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-3 py-1.5 rounded-xl">สำเร็จแล้ว</span>
             ` : `
-              <button onclick="window.claimQuest('${quest.id}',${quest.reward})" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition">
+              <button onclick="window.claimQuest('${quest.id}',${quest.reward})" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
                 ส่งเควส
               </button>
             `}
@@ -380,6 +382,8 @@
         alert(`🎉 สำเร็จเควส! ได้รับ +${reward} Points`);
         updateUI();
         renderQuests();
+      } else {
+        alert('เกิดข้อผิดพลาดในการรับเควส โปรดลองอีกครั้ง');
       }
     };
 
@@ -405,6 +409,8 @@
         updateUI();
         renderUpgrades();
         renderRoom();
+      } else {
+        alert('เกิดข้อผิดพลาดในการอัปเกรด โปรดลองอีกครั้ง');
       }
     };
   </script>
