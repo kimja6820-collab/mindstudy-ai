@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EdTech Flashcards Pro - สรุปบทเรียน & บล็อกคำถาม</title>
+    <title>EdTech Flashcards Pro - ระบบจัดการกองการ์ด</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts (Kanit & Inter) -->
@@ -17,15 +17,6 @@
                 extend: {
                     fontFamily: {
                         sans: ['Kanit', 'Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d',
-                        }
                     }
                 }
             }
@@ -64,13 +55,11 @@
                 </div>
             </div>
 
-            <!-- Score / Point Badge (Synced with LocalStorage) -->
-            <div class="flex items-center space-x-4">
-                <div class="flex items-center space-x-2 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full">
-                    <i data-lucide="award" class="w-5 h-5 text-amber-500 fill-amber-400"></i>
-                    <span class="text-xs font-semibold text-amber-700 uppercase tracking-wider">Score:</span>
-                    <span id="score-display" class="font-bold text-amber-800 text-sm">0</span>
-                </div>
+            <div class="flex items-center space-x-2">
+                <button id="open-deck-modal-btn" class="flex items-center space-x-1 border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg text-sm font-medium transition-all">
+                    <i data-lucide="folder-plus" class="w-4 h-4"></i>
+                    <span>สร้างกองการ์ดใหม่</span>
+                </button>
                 <button id="open-add-modal-btn" class="flex items-center space-x-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow">
                     <i data-lucide="plus" class="w-4 h-4"></i>
                     <span>เพิ่มการ์ด</span>
@@ -80,10 +69,27 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 flex flex-col items-center justify-center">
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6 flex flex-col items-center">
         
-        <!-- Category & Progress Header -->
-        <div class="w-full flex items-center justify-between mb-6">
+        <!-- Deck Selection Bar -->
+        <div class="w-full bg-white border border-slate-200 rounded-xl p-4 mb-6 shadow-sm">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div class="flex items-center space-x-2 w-full sm:w-auto">
+                    <i data-lucide="library" class="w-5 h-5 text-indigo-600 shrink-0"></i>
+                    <label for="deck-select" class="text-sm font-semibold text-slate-700 shrink-0">เลือกกองการ์ด:</label>
+                    <select id="deck-select" class="w-full sm:w-64 px-3 py-1.5 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                        <!-- Options generated dynamically -->
+                    </select>
+                </div>
+                <button id="delete-deck-btn" class="text-xs text-red-500 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded transition-colors flex items-center space-x-1 self-end sm:self-auto">
+                    <i data-lucide="folder-minus" class="w-3.5 h-3.5"></i>
+                    <span>ลบกองการ์ดนี้</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Header -->
+        <div class="w-full flex items-center justify-between mb-4">
             <span id="category-badge" class="bg-indigo-50 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full border border-indigo-100">
                 General
             </span>
@@ -127,52 +133,62 @@
             </div>
         </div>
 
-        <!-- Controls & Scoring Action -->
-        <div class="w-full max-w-lg mt-8 flex flex-col gap-4">
-            <!-- Scoring Button -->
-            <button id="remember-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white py-3.5 rounded-xl font-medium shadow-md shadow-emerald-600/20 flex items-center justify-center space-x-2 transition-all">
-                <i data-lucide="check-circle" class="w-5 h-5"></i>
-                <span>จำได้ (+0.5 พอยท์)</span>
+        <!-- Controls -->
+        <div class="w-full max-w-lg mt-6 flex items-center justify-between bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
+            <button id="prev-btn" class="p-2.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors" title="การ์ดก่อนหน้า">
+                <i data-lucide="chevron-left" class="w-5 h-5"></i>
             </button>
-
-            <!-- Navigation Controls -->
-            <div class="flex items-center justify-between bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
-                <button id="prev-btn" class="p-2.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors" title="การ์ดก่อนหน้า">
-                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+            
+            <div class="flex items-center space-x-2">
+                <button id="shuffle-btn" class="p-2.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors" title="สุ่มการ์ดในกอง">
+                    <i data-lucide="shuffle" class="w-4 h-4"></i>
                 </button>
-                
-                <div class="flex items-center space-x-2">
-                    <button id="shuffle-btn" class="p-2.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors" title="สุ่มการ์ด">
-                        <i data-lucide="shuffle" class="w-4 h-4"></i>
-                    </button>
-                    <button id="delete-card-btn" class="p-2.5 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-lg transition-colors" title="ลบการ์ดนี้">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
-                </div>
-
-                <button id="next-btn" class="p-2.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors" title="การ์ดถัดไป">
-                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                <button id="delete-card-btn" class="p-2.5 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-lg transition-colors" title="ลบการ์ดนี้">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
                 </button>
             </div>
+
+            <button id="next-btn" class="p-2.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors" title="การ์ดถัดไป">
+                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+            </button>
         </div>
 
     </main>
+
+    <!-- Modal for Creating New Deck -->
+    <div id="deck-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-slate-800">สร้างกองการ์ดใหม่</h3>
+                <button id="close-deck-modal-btn" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <form id="add-deck-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">ชื่อกองการ์ด / หมวดหมู่</label>
+                    <input type="text" id="input-deck-name" required class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="เช่น กองที่ 1: ศัพท์ภาษาอังกฤษ">
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" id="cancel-deck-btn" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50">ยกเลิก</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">สร้างกองการ์ด</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Modal for Adding New Card -->
     <div id="add-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-slate-800">เพิ่ม Flashcard ใหม่</h3>
+                <h3 class="text-lg font-bold text-slate-800">เพิ่ม Flashcard ในกองนี้</h3>
                 <button id="close-add-modal-btn" class="text-slate-400 hover:text-slate-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
             
             <form id="add-card-form" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">หมวดหมู่</label>
-                    <input type="text" id="input-category" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="เช่น Terminology, Theory">
-                </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">ด้านหน้า (คำถาม/หัวข้อ)</label>
                     <textarea id="input-front" required rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="กรอกข้อความด้านหน้า..."></textarea>
@@ -189,52 +205,34 @@
         </div>
     </div>
 
-    <!-- JavaScript Data and App Logic -->
+    <!-- JavaScript App Logic -->
     <script>
-        // ข้อมูลเริ่มต้นสำหรับกรณีเพิ่งใช้งานครั้งแรก
-        const defaultFlashcards = [
-            {
-                front: "Pedagogy",
-                back: "ศาสตร์และศิลป์แห่งการสอนเด็ก หรือวิธีการสอนโดยเน้นผู้เรียนและครูเป็นศูนย์กลางการเรียนรู้",
-                category: "Terminology"
-            },
-            {
-                front: "Andragogy",
-                back: "แนวทางการจัดการเรียนรู้สำหรับผู้ใหญ่ (Adult Learning) ที่เน้นประสบการณ์และการนำไปใช้จริง",
-                category: "Terminology"
-            },
-            {
-                front: "Bloom's Taxonomy",
-                back: "การจำแนกวัตถุประสงค์การเรียนรู้ 6 ระดับ: จำ -> เข้าใจ -> ประยุกต์ใช้ -> วิเคราะห์ -> ประเมินค่า -> สร้างสรรค์",
-                category: "Theory"
-            },
-            {
-                front: "Formative Assessment",
-                back: "การประเมินเพื่อปรับปรุงและพัฒนาการเรียนรู้ระหว่างกระบวนการสอน (เช่น ควิซสั้น, การตั้งคำถาม)",
-                category: "Assessment"
-            },
-            {
-                front: "Active Learning",
-                back: "กระบวนการเรียนรู้ที่ให้ผู้เรียนมีส่วนร่วมในการคิด วิเคราะห์ ทำกิจกรรม และสรุปองค์ความรู้ด้วยตนเอง",
-                category: "Strategy"
-            }
-        ];
+        // ข้อมูลเริ่มต้นแยกเป็นกอง (Decks)
+        const defaultDecks = {
+            "กองที่ 1: ศัพท์ทั่วไป": [
+                { front: "Pedagogy", back: "ศาสตร์และศิลป์แห่งการสอนเด็ก หรือวิธีการสอนโดยเน้นผู้เรียนและครูเป็นศูนย์กลางการเรียนรู้" },
+                { front: "Andragogy", back: "แนวทางการจัดการเรียนรู้สำหรับผู้ใหญ่ (Adult Learning) ที่เน้นประสบการณ์และการนำไปใช้จริง" }
+            ],
+            "กองที่ 2: ทฤษฎีและการประเมิน": [
+                { front: "Bloom's Taxonomy", back: "การจำแนกวัตถุประสงค์การเรียนรู้ 6 ระดับ: จำ -> เข้าใจ -> ประยุกต์ใช้ -> วิเคราะห์ -> ประเมินค่า -> สร้างสรรค์" },
+                { front: "Formative Assessment", back: "การประเมินเพื่อปรับปรุงและพัฒนาการเรียนรู้ระหว่างกระบวนการสอน" }
+            ]
+        };
 
-        // -------------------------------------------------------------
-        // 1. ตั้งค่า KEY กลางสำหรับ localStorage (ต้องตรงกับหน้า dashboard.html)
-        // -------------------------------------------------------------
-        const SCORE_KEY = 'userPoints'; // <-- ตรวจสอบชื่อ Key ให้ตรงกับหน้าหลัก
-        const FLASHCARDS_KEY = 'flashcards_data';
+        const DECKS_KEY = 'flashcard_decks_data';
+        const CURRENT_DECK_KEY = 'flashcard_current_deck';
 
-        // โหลดข้อมูลการ์ดและคะแนน
-        let flashcards = JSON.parse(localStorage.getItem(FLASHCARDS_KEY)) || defaultFlashcards;
-        let score = parseFloat(localStorage.getItem(SCORE_KEY)) || 0;
+        // โหลดข้อมูลจาก LocalStorage
+        let decks = JSON.parse(localStorage.getItem(DECKS_KEY)) || defaultDecks;
+        let activeDeckName = localStorage.getItem(CURRENT_DECK_KEY) || Object.keys(decks)[0] || "";
 
         let currentIndex = 0;
         let isFlipped = false;
 
         // DOM Elements
-        const scoreDisplay = document.getElementById('score-display');
+        const deckSelect = document.getElementById('deck-select');
+        const deleteDeckBtn = document.getElementById('delete-deck-btn');
+        
         const flashcardContainer = document.getElementById('flashcard-container');
         const flashcard = document.getElementById('flashcard');
         const cardFrontText = document.getElementById('card-front-text');
@@ -242,32 +240,65 @@
         const categoryBadge = document.getElementById('category-badge');
         const progressText = document.getElementById('progress-text');
 
-        const rememberBtn = document.getElementById('remember-btn');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
         const shuffleBtn = document.getElementById('shuffle-btn');
         const deleteCardBtn = document.getElementById('delete-card-btn');
 
+        // Modal Elements
         const addModal = document.getElementById('add-modal');
         const openAddModalBtn = document.getElementById('open-add-modal-btn');
         const closeAddModalBtn = document.getElementById('close-add-modal-btn');
         const cancelAddBtn = document.getElementById('cancel-add-btn');
         const addCardForm = document.getElementById('add-card-form');
 
-        // Update Score UI + Save to LocalStorage
-        function updateScore(newScore) {
-            score = newScore;
-            scoreDisplay.textContent = score;
-            // บันทึกกลับลง localStorage เพื่อให้หน้าหลักอ่านได้
-            localStorage.setItem(SCORE_KEY, score.toString());
+        const deckModal = document.getElementById('deck-modal');
+        const openDeckModalBtn = document.getElementById('open-deck-modal-btn');
+        const closeDeckModalBtn = document.getElementById('close-deck-modal-btn');
+        const cancelDeckBtn = document.getElementById('cancel-deck-btn');
+        const addDeckForm = document.getElementById('add-deck-form');
+
+        // บันทึกลง LocalStorage
+        function saveData() {
+            localStorage.setItem(DECKS_KEY, JSON.stringify(decks));
+            localStorage.setItem(CURRENT_DECK_KEY, activeDeckName);
         }
 
-        // Display current card
+        // แสดงผลรายการ Deck ใน Select Dropdown
+        function renderDeckOptions() {
+            deckSelect.innerHTML = '';
+            const deckNames = Object.keys(decks);
+
+            if (deckNames.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = "";
+                opt.textContent = "-- ไม่มีกองการ์ด --";
+                deckSelect.appendChild(opt);
+                activeDeckName = "";
+                return;
+            }
+
+            if (!decks[activeDeckName]) {
+                activeDeckName = deckNames[0];
+            }
+
+            deckNames.forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                if (name === activeDeckName) option.selected = true;
+                deckSelect.appendChild(option);
+            });
+        }
+
+        // แสดงผลการ์ดปัจจุบัน
         function renderCard() {
-            if (flashcards.length === 0) {
-                cardFrontText.textContent = "ไม่มีข้อมูลการ์ด";
-                cardBackText.textContent = "กรุณาเพิ่มการ์ดใหม่";
-                categoryBadge.textContent = "None";
+            const currentCards = decks[activeDeckName] || [];
+
+            if (currentCards.length === 0) {
+                cardFrontText.textContent = activeDeckName ? "ไม่มีการ์ดในกองนี้" : "ยังไม่มีกองการ์ด";
+                cardBackText.textContent = "กดปุ่ม 'เพิ่มการ์ด' ด้านบนเพื่อสร้างการ์ดใบแรก";
+                categoryBadge.textContent = activeDeckName || "None";
                 progressText.textContent = "0 of 0";
                 return;
             }
@@ -278,72 +309,118 @@
                 isFlipped = false;
             }
 
-            const current = flashcards[currentIndex];
+            const current = currentCards[currentIndex];
             cardFrontText.textContent = current.front;
             cardBackText.textContent = current.back;
-            categoryBadge.textContent = current.category || "General";
-            progressText.textContent = `Card ${currentIndex + 1} of ${flashcards.length}`;
+            categoryBadge.textContent = activeDeckName;
+            progressText.textContent = `Card ${currentIndex + 1} of ${currentCards.length}`;
         }
 
-        // Event: Flip Card
+        // พลิกการ์ด
         flashcardContainer.addEventListener('click', () => {
-            if (flashcards.length === 0) return;
+            const currentCards = decks[activeDeckName] || [];
+            if (currentCards.length === 0) return;
             isFlipped = !isFlipped;
             flashcard.classList.toggle('rotate-y-180', isFlipped);
         });
 
-        // Event: Add Points (+0.5)
-        rememberBtn.addEventListener('click', () => {
-            if (flashcards.length === 0) return;
-            updateScore(score + 0.5);
-            
-            // เปลี่ยนการ์ดถัดไปอัตโนมัติ
-            if (currentIndex < flashcards.length - 1) {
-                currentIndex++;
-            } else {
-                currentIndex = 0;
-            }
+        // สลับกองการ์ด
+        deckSelect.addEventListener('change', (e) => {
+            activeDeckName = e.target.value;
+            currentIndex = 0;
+            saveData();
             renderCard();
         });
 
-        // Navigation Controls
+        // ปุ่มควบคุม Navigation
         prevBtn.addEventListener('click', () => {
-            if (flashcards.length === 0) return;
-            currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+            const currentCards = decks[activeDeckName] || [];
+            if (currentCards.length === 0) return;
+            currentIndex = (currentIndex - 1 + currentCards.length) % currentCards.length;
             renderCard();
         });
 
         nextBtn.addEventListener('click', () => {
-            if (flashcards.length === 0) return;
-            currentIndex = (currentIndex + 1) % flashcards.length;
+            const currentCards = decks[activeDeckName] || [];
+            if (currentCards.length === 0) return;
+            currentIndex = (currentIndex + 1) % currentCards.length;
             renderCard();
         });
 
         shuffleBtn.addEventListener('click', () => {
-            if (flashcards.length <= 1) return;
-            for (let i = flashcards.length - 1; i > 0; i--) {
+            const currentCards = decks[activeDeckName] || [];
+            if (currentCards.length <= 1) return;
+            for (let i = currentCards.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+                [currentCards[i], currentCards[j]] = [currentCards[j], currentCards[i]];
             }
             currentIndex = 0;
-            localStorage.setItem(FLASHCARDS_KEY, JSON.stringify(flashcards));
+            saveData();
             renderCard();
         });
 
         deleteCardBtn.addEventListener('click', () => {
-            if (flashcards.length === 0) return;
-            if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบการ์ดนี้?")) {
-                flashcards.splice(currentIndex, 1);
-                if (currentIndex >= flashcards.length && currentIndex > 0) {
+            const currentCards = decks[activeDeckName] || [];
+            if (currentCards.length === 0) return;
+
+            if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบการ์ดใบนี้?")) {
+                currentCards.splice(currentIndex, 1);
+                if (currentIndex >= currentCards.length && currentIndex > 0) {
                     currentIndex--;
                 }
-                localStorage.setItem(FLASHCARDS_KEY, JSON.stringify(flashcards));
+                saveData();
                 renderCard();
             }
         });
 
-        // Modal Controls
-        openAddModalBtn.addEventListener('click', () => addModal.classList.remove('hidden'));
+        // ลบกองการ์ด
+        deleteDeckBtn.addEventListener('click', () => {
+            if (!activeDeckName || !decks[activeDeckName]) return;
+
+            if (confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ "${activeDeckName}" พร้อมการ์ดทั้งหมดในกอง?`)) {
+                delete decks[activeDeckName];
+                const remainingDecks = Object.keys(decks);
+                activeDeckName = remainingDecks.length > 0 ? remainingDecks[0] : "";
+                currentIndex = 0;
+                saveData();
+                renderDeckOptions();
+                renderCard();
+            }
+        });
+
+        // Modal - เพิ่ม Deck
+        openDeckModalBtn.addEventListener('click', () => deckModal.classList.remove('hidden'));
+        closeDeckModalBtn.addEventListener('click', () => deckModal.classList.add('hidden'));
+        cancelDeckBtn.addEventListener('click', () => deckModal.classList.add('hidden'));
+
+        addDeckForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const deckName = document.getElementById('input-deck-name').value.trim();
+
+            if (deckName) {
+                if (!decks[deckName]) {
+                    decks[deckName] = [];
+                }
+                activeDeckName = deckName;
+                currentIndex = 0;
+                saveData();
+                renderDeckOptions();
+                renderCard();
+                
+                deckModal.classList.add('hidden');
+                addDeckForm.reset();
+            }
+        });
+
+        // Modal - เพิ่ม Card
+        openAddModalBtn.addEventListener('click', () => {
+            if (!activeDeckName) {
+                alert("กรุณาสร้างกองการ์ดก่อนเพิ่มการ์ด");
+                deckModal.classList.remove('hidden');
+                return;
+            }
+            addModal.classList.remove('hidden');
+        });
         closeAddModalBtn.addEventListener('click', () => addModal.classList.add('hidden'));
         cancelAddBtn.addEventListener('click', () => addModal.classList.add('hidden'));
 
@@ -351,23 +428,24 @@
             e.preventDefault();
             const front = document.getElementById('input-front').value.trim();
             const back = document.getElementById('input-back').value.trim();
-            const category = document.getElementById('input-category').value.trim();
 
-            if (front && back) {
-                flashcards.push({ front, back, category });
-                localStorage.setItem(FLASHCARDS_KEY, JSON.stringify(flashcards));
-                currentIndex = flashcards.length - 1;
+            if (front && back && activeDeckName) {
+                if (!decks[activeDeckName]) decks[activeDeckName] = [];
+                
+                decks[activeDeckName].push({ front, back });
+                currentIndex = decks[activeDeckName].length - 1;
+                
+                saveData();
                 renderCard();
+                
                 addModal.classList.add('hidden');
                 addCardForm.reset();
             }
         });
 
-        // Initialize Lucide Icons
+        // Initialize Icons & Render App
         lucide.createIcons();
-
-        // Initial Setup
-        updateScore(score);
+        renderDeckOptions();
         renderCard();
     </script>
 </body>
