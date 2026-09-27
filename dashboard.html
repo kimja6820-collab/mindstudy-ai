@@ -64,7 +64,7 @@
         <div class="flex justify-between items-center">
           <div>
             <h2 class="text-xl font-bold text-slate-800">📝 แบบประเมินความเครียด & ไดอารี่วันนี้</h2>
-            <p class="text-xs text-slate-400 mt-1">บันทึกความรู้สึกได้สูงสุด 3 ครั้ง/วัน</p>
+            <p class="text-xs text-slate-400 mt-1">บันทึกความรู้สึกได้สูงสุด 3 ครั้ง/วัน (รับ +20 Points สำหรับการบันทึกครั้งแรกของวัน)</p>
           </div>
           <span class="text-xs font-bold px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full" id="dailyLimitBadge">
             โควต้าคงเหลือวันนี้: 3/3 ครั้ง
@@ -99,7 +99,7 @@
         </div>
 
         <button id="saveDiaryBtn" onclick="window.handleSaveDiary()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-2xl transition shadow-md disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed disabled:shadow-none">
-          บันทึกไดอารี่ (+20 Points)
+          บันทึกไดอารี่
         </button>
       </div>
 
@@ -244,7 +244,7 @@
         .from('profiles')
         .select('points')
         .eq('id', currentUser.id)
-        .single();
+        .maybeSingle();
 
       if (data && !error) {
         const points = parseFloat(data.points) || 0;
@@ -293,11 +293,20 @@
 
       const startOfTodayISO = getStartOfToday().toISOString();
 
-      const { data: todayEntries } = await supabase
+      // 1. ตรวจสอบจำนวนไดอารี่ที่เคยบันทึกในวันนี้
+      const { data: todayEntries, error: checkErr } = await supabase
         .from('diaries')
         .select('id')
         .eq('user_id', currentUser.id)
         .gte('created_at', startOfTodayISO);
+
+      if (checkErr) {
+        alert('เกิดข้อผิดพลาดในการตรวจสอบโควต้า: ' + checkErr.message);
+        return;
+      }
+
+      // เช็กว่าเป็นบันทึกครั้งแรกของวันนี้หรือไม่
+      const isFirstTimeToday = !todayEntries || todayEntries.length === 0;
 
       if (todayEntries && todayEntries.length >= 3) {
         alert('คุณบันทึกไดอารี่ครบ 3 ครั้งสำหรับวันนี้แล้วครับ');
@@ -305,6 +314,7 @@
         return;
       }
 
+      // 2. บันทึกข้อมูลไดอารี่
       const { error: diaryErr } = await supabase.from('diaries').insert([{
         user_id: currentUser.id,
         stress_level: selectedStress,
@@ -313,16 +323,39 @@
       }]);
 
       if (diaryErr) {
-        alert('เกิดข้อผิดพลาด: ' + diaryErr.message);
+        alert('เกิดข้อผิดพลาดในการบันทึกไดอารี่: ' + diaryErr.message);
         return;
       }
 
-      const { data: profile } = await supabase.from('profiles').select('points').eq('id', currentUser.id).single();
-      const newPoints = (profile?.points || 0) + 20;
+      // 3. เพิ่ม พ้อยท์ (+20) เฉพาะกรณีที่เป็นการบันทึกครั้งแรกของวัน
+      if (isFirstTimeToday) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('points')
+          .eq('id', currentUser.id)
+          .maybeSingle();
 
-      await supabase.from('profiles').update({ points: newPoints }).eq('id', currentUser.id);
+        const currentPoints = parseFloat(profile?.points) || 0;
+        const newPoints = currentPoints + 20;
 
-      alert('บันทึกสำเร็จ! คุณได้รับ +20 Points');
+        // ใช้ upsert เพื่อสร้าง/อัปเดตแถวใน profiles เสมอ
+        const { error: profileErr } = await supabase
+          .from('profiles')
+          .upsert({ 
+            id: currentUser.id, 
+            points: newPoints 
+          }, { onConflict: 'id' });
+
+        if (profileErr) {
+          console.error('ไม่สามารถอัปเดตพ้อยท์ได้:', profileErr.message);
+        } else {
+          alert('บันทึกสำเร็จ! คุณได้รับ +20 Points (โบนัสบันทึกครั้งแรกของวัน)');
+        }
+      } else {
+        alert('บันทึกสำเร็จ! (คุณรับ Points ของวันนี้ไปแล้ว)');
+      }
+
+      // ล้างค่าอินพุต
       document.getElementById('diaryInput').value = '';
       selectedStress = '';
       selectedEmoji = '';
@@ -368,7 +401,8 @@
           badge.className = "text-xs font-bold px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full";
           
           saveBtn.disabled = false;
-          saveBtn.innerText = "บันทึกไดอารี่ (+20 Points)";
+          // ปรับปุ่มแสดงผลตามสถานะการได้รับ Points ของวันนี้
+          saveBtn.innerText = todayCount === 0 ? "บันทึกไดอารี่ (+20 Points)" : "บันทึกไดอารี่";
           diaryInput.disabled = false;
           diaryInput.placeholder = "วันนี้รู้สึกอย่างไรบ้าง มีเรื่องอะไรกังวลใจไหม...";
 
