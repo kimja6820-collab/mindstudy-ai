@@ -207,7 +207,19 @@
 
     <!-- JavaScript App Logic -->
     <script>
-        // ข้อมูลเริ่มต้นแยกเป็นกอง (Decks)
+        // ดึง User ID จาก Session / LocalStorage / User Object ของระบบ Login (ปรับชื่อ Key ให้ตรงตามระบบของคุณได้)
+        function getUserId() {
+            const user = JSON.parse(localStorage.getItem('user')) || JSON.parse(sessionStorage.getItem('user'));
+            return user?.id || user?.email || localStorage.getItem('current_user_id') || 'guest';
+        }
+
+        const userId = getUserId();
+
+        // สรุปชื่อ Key แยกเฉพาะของผู้ใช้รายนั้นๆ
+        const DECKS_KEY = `flashcard_decks_data_${userId}`;
+        const CURRENT_DECK_KEY = `flashcard_current_deck_${userId}`;
+
+        // ข้อมูลเริ่มต้นแยกเป็นกอง (Decks) กรณีเป็นไอดีใหม่
         const defaultDecks = {
             "กองที่ 1: ศัพท์ทั่วไป": [
                 { front: "Pedagogy", back: "ศาสตร์และศิลป์แห่งการสอนเด็ก หรือวิธีการสอนโดยเน้นผู้เรียนและครูเป็นศูนย์กลางการเรียนรู้" },
@@ -219,10 +231,7 @@
             ]
         };
 
-        const DECKS_KEY = 'flashcard_decks_data';
-        const CURRENT_DECK_KEY = 'flashcard_current_deck';
-
-        // โหลดข้อมูลจาก LocalStorage
+        // โหลดข้อมูลจาก LocalStorage ตาม User ID
         let decks = JSON.parse(localStorage.getItem(DECKS_KEY)) || defaultDecks;
         let activeDeckName = localStorage.getItem(CURRENT_DECK_KEY) || Object.keys(decks)[0] || "";
 
